@@ -1,3 +1,7 @@
-import { Telegraf } from 'telegraf'
+import { Telegraf, Context } from 'telegraf'
 
-export const bot = new Telegraf(process.env.TOKEN)
+export interface SessionContext extends Context {
+    session: any;
+};
+
+export const bot = new Telegraf<SessionContext>(process.env.TOKEN)

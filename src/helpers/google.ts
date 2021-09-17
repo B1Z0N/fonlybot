@@ -17,7 +17,7 @@ export class GoogleAuth implements IAuthorization {
     const data = await fs.readFile(CREDENTIALS_PATH)
     const { client_secret, client_id, redirect_uris } = JSON.parse(
       data.toString()
-    ).installedd
+    ).installed
     const oauth = new google.auth.OAuth2(client_id, client_secret, REDIRECT_URL)
     
     const gauth = new GoogleAuth();
