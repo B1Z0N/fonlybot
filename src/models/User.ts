@@ -2,6 +2,7 @@ import { prop, getModelForClass, Severity } from '@typegoose/typegoose'
 import { Schema } from 'mongoose'
 import { Auth } from 'googleapis'
 
+// TOOD: maybe we could generate this?
 class GoogleCredentials implements Auth.Credentials {
   @prop()
   public access_token?: string

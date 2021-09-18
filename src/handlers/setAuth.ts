@@ -2,26 +2,27 @@ import { IAuthorization } from '@/helpers/google'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Scenes, Telegraf } from 'telegraf'
 
+const GOOGLE_SCENE_ID = 'GOOGLE_AUTH_SCENE'
+
 export function setupAuthHandlers(
     bot: Telegraf<MongoSessionContext>,
     auth: IAuthorization
 ) {
-    const googleScene = new Scenes.BaseScene<Scenes.SceneContext>('GOOGLE_AUTH_SCENE')
-    googleScene.enter((ctx) =>
-        ctx.replyWithMarkdown(
-            `Signin [here](${process.env.GOOGLE}) and paste the code below`
-        )
+    const googleScene = new Scenes.BaseScene<Scenes.SceneContext>(GOOGLE_SCENE_ID)
+    googleScene.enter(ctx =>
+        ctx.replyWithMarkdown(ctx.i18n.t('google_signin').replace('{0}', process.env.GOOGLE))
     )
     googleScene.on('text', async (ctx) => {
         const code = ctx.message.text
         try {
             ctx.dbuser.token = await auth.getToken(code)
-            ctx.dbuser.updateOne()
-            ctx.reply('Successfully settled up google.')
+            ctx.dbuser = await ctx.dbuser.save()
+
+            ctx.reply(ctx.i18n.t('google_success'))
             console.log('Successfully settled up google.')
             ctx.scene.leave()
         } catch(err) {
-            ctx.reply('Something wrong with the code, try again.')
+            ctx.reply(ctx.i18n.t('google_failure'))
             console.log(`Error on getting google auth code: ${err}.`)
             ctx.scene.reenter()
         }
@@ -29,5 +30,5 @@ export function setupAuthHandlers(
     
     const stage = new Scenes.Stage([ googleScene ])
     bot.use(stage.middleware())
-    bot.command('google', async ctx => await ctx.scene.enter('GOOGLE_AUTH_SCENE'))
+    bot.command('google', async ctx => await ctx.scene.enter(GOOGLE_SCENE_ID))
 }

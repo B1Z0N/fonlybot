@@ -14,6 +14,7 @@ import { attachUser } from '@/middlewares/attachUser'
 // Commands
 import { sendHelp } from '@/handlers/sendHelp'
 import { setupAuthHandlers } from './handlers/setAuth'
+import { setupUploadHandlers } from './handlers/uploadDoc'
 import { setLanguage, sendLanguage } from '@/handlers/language'
 
 // Actions
@@ -40,6 +41,7 @@ import { mongoConnect } from './models'
   bot.command(['help', 'start'], sendHelp)
   bot.command('language', sendLanguage)
   setupAuthHandlers(bot, auth)
+  setupUploadHandlers(bot, auth)
 
   // Actions
   bot.action(localeActions, setLanguage)

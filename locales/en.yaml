@@ -1,5 +1,14 @@
 name: English
 help: |
   <b>Bot</b> allows you to see how Telegraf bots can be built.
+
 language: Please, select the language.
 language_selected: <b>Bot</b> now speaks English.
+
+google_signin: Signin [here]({0}) and paste the code below.
+google_success: Successfully settled up google.
+google_failure: Something wrong with the code, try again.
+
+upload_doc_enter: Upload a file to get it's link on google drive.
+upload_doc_success: You've successfully uploaded a [file]({0}).
+upload_doc_failure: Failure on file upload, try again.
