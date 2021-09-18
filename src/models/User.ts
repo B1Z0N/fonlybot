@@ -1,11 +1,33 @@
-import { prop, getModelForClass } from '@typegoose/typegoose'
+import { prop, getModelForClass, Severity } from '@typegoose/typegoose'
+import { Schema } from 'mongoose'
+import { Auth } from 'googleapis'
+
+class GoogleCredentials implements Auth.Credentials {
+  @prop()
+  public access_token?: string
+
+  @prop()
+  public refresh_token?: string
+
+  @prop()
+  public scope?: string
+
+  @prop()
+  public token_type?: string
+  
+  @prop()
+  public expiry_date?: number
+}
 
 export class User {
   @prop({ required: true, index: true, unique: true })
-  id: number
+  public id: number
 
   @prop({ required: true, default: 'en' })
-  language: string
+  public language: string
+
+  @prop()
+  public token: GoogleCredentials
 }
 
 // Get User model
