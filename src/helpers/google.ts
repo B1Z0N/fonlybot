@@ -11,15 +11,20 @@ export interface IAuthorization {
     getAuthUrl: () => Promise<string>
     getToken: (code: string) => Promise<Auth.Credentials>
     upload: (
+        token: Auth.Credentials,
         data: Readable,
         name: string,
-        token: Auth.Credentials
-    ) => Promise<string>
+        folderId?: string
+    ) => Promise<IUploadInfo> 
+}
+
+export interface IUploadInfo {
+    url: string
+    folderId?: string
 }
 
 export class GoogleAuth implements IAuthorization {
     auth: Auth.OAuth2Client
-    folderId?: string
 
     static async build() {
         const data = await fs.readFile(CREDENTIALS_PATH)
@@ -50,26 +55,23 @@ export class GoogleAuth implements IAuthorization {
         return tokens
     }
 
-    async upload(data: Readable, name: string, token: Auth.Credentials) {
+    async upload(
+        token: Auth.Credentials,
+        data: Readable,
+        name: string,
+        folderId?: string
+    ) {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
 
-        if (!this.folderId) {
-            const folderRes = await drive.files.create({
-                requestBody: {
-                    name: 'fonly_folder',
-                    mimeType: 'application/vnd.google-apps.folder',
-                },
-            })
-            this.folderId = folderRes.data.id
-        }
+        folderId = await GoogleAuth.createFolderIfNotExists(drive, folderId)
 
         const mimeType = this.getMimeType(name)
         const fileRes = await drive.files.create({
             requestBody: {
                 name,
                 mimeType,
-                parents: [this.folderId],
+                parents: [folderId],
             },
             media: {
                 mimeType,
@@ -85,7 +87,21 @@ export class GoogleAuth implements IAuthorization {
             },
         })
 
-        return this.fileLinkFromId(fileRes.data.id)
+        return { url: this.fileLinkFromId(fileRes.data.id), folderId }
+    }
+
+    private static async createFolderIfNotExists(drive: drive_v3.Drive, folderId?: string) {
+        if (!folderId) {
+            const folderRes = await drive.files.create({
+                requestBody: {
+                    name: 'fonly_folder',
+                    mimeType: 'application/vnd.google-apps.folder',
+                },
+            })
+            folderId = folderRes.data.id
+        }
+
+        return folderId
     }
 
     private fileLinkFromId(fileId: string) {

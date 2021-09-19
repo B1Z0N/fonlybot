@@ -18,6 +18,9 @@ class GoogleCredentials implements Auth.Credentials {
 
     @prop()
     public expiry_date?: number
+
+    @prop()
+    public folderId?: string
 }
 
 export class User {
@@ -28,7 +31,7 @@ export class User {
     public language: string
 
     @prop()
-    public token?: GoogleCredentials
+    public credentials?: GoogleCredentials
 }
 
 // Get User model

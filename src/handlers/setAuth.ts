@@ -28,7 +28,7 @@ export function setupAuthHandlers(
         }
 
         try {
-            ctx.dbuser.token = await auth.getToken(code)
+            ctx.dbuser.credentials = await auth.getToken(code)
             ctx.dbuser = await ctx.dbuser.save()
 
             ctx.reply(ctx.i18n.t('google_success'))
