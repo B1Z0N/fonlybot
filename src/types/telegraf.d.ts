@@ -3,8 +3,8 @@ import { User } from '@/models'
 import { DocumentType } from '@typegoose/typegoose'
 
 declare module 'telegraf' {
-  export class Context {
-    dbuser: DocumentType<User>
-    i18n: I18N
-  }
+    export class Context {
+        dbuser: DocumentType<User>
+        i18n: I18N
+    }
 }

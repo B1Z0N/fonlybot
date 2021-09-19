@@ -1,14 +1,23 @@
 name: English
-help: |
-  <b>Bot</b> allows you to see how Telegraf bots can be built.
+help_html: |
+  <b>Fonly</b>👋 allows you to upload a doc to google drive and get a link to it. 
+  It comes in handy when you don't have any docx editor installed: you can work with it online.
+  
+  <b>Main workflow</b>:
+  
+  Authorize with /google(only first time), give me any file and get your link. That simple.
+
+authorized_html: Currently you are <b>authorized</b> 🟢.
+not_authorized_html: Currently you are <b>not authorized</b> 🔴(press /google to use me).
 
 language: Please, select the language.
-language_selected: <b>Bot</b> now speaks English.
+language_selected_html: <b>Fonly</b> speaks English now.
 
-google_signin: Signin [here]({0}) and paste the code below.
-google_success: Successfully settled up google.
-google_failure: Something wrong with the code, try again.
+google_signin_md: Signin [here]({0}) and paste the code below, so I could take care of everything else. 
+google_success: Successfully signed in. Try giving me some files.
+google_failure: Oops, something wrong with your code, try again.
 
-upload_doc_enter: Upload a file to get it's link on google drive.
-upload_doc_success: You've successfully uploaded a [file]({0}).
-upload_doc_failure: Failure on file upload, try again.
+upload_success_md: You've successfully uploaded ["{0}"]({1}).
+upload_failure_md: Failure on "{0}"" upload, try again.
+
+authorize_first_md: Authorize with /google before sending any docs.

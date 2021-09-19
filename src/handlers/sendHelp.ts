@@ -1,5 +1,14 @@
 import { Context } from 'telegraf'
 
 export function sendHelp(ctx: Context) {
-  return ctx.replyWithHTML(ctx.i18n.t('help'))
+    return ctx.replyWithHTML(
+        ctx.i18n.t('help_html') +
+            '\n' +
+            ctx.i18n.t(
+                ctx.dbuser.token ? 'authorized_html' : 'not_authorized_html'
+            )
+    )
 }
+
+// создавать папку
+// говорить под каким ником в гугле авторизированы
