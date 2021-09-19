@@ -1,9 +1,7 @@
 import { promises as fs } from 'fs'
-import { auth } from 'google-auth-library'
 import { google, Auth, drive_v3 } from 'googleapis'
-import { file } from 'googleapis/build/src/apis/file'
-import { reseller } from 'googleapis/build/src/apis/reseller'
 import { Readable } from 'stream'
+import * as mime from 'mime-types'
 
 const SCOPES = 'https://www.googleapis.com/auth/drive'
 const REDIRECT_URL = 'urn:ietf:wg:oauth:2.0:oob'
@@ -54,13 +52,14 @@ export class GoogleAuth implements IAuthorization {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
 
+        const mimeType = this.getMimeType(name)
         const fileRes = await drive.files.create({
             requestBody: {
                 name,
-                mimeType: 'text/plain',
+                mimeType,
             },
             media: {
-                mimeType: 'text/plain',
+                mimeType,
                 body: data,
             },
         })
@@ -77,7 +76,10 @@ export class GoogleAuth implements IAuthorization {
     }
 
     private fileLinkFromId(fileId: string) {
-      return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
+        return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
+    }
+
+    private getMimeType(name: string) {
+        return mime.lookup(name) || 'text/plain'
     }
 }
-
