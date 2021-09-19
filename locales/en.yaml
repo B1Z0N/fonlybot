@@ -6,7 +6,6 @@ help_html: |
   <b>Main workflow</b>:
   
   Authorize with /google(only first time), give me any file and get your link. That simple 🔥.
-
   If you like me, give me a star 🌟, right <a href="https://github.com/B1Z0N/fonlybot">here</a>.
 
 authorized_html: Currently you are <b>authorized</b> 🟢.
