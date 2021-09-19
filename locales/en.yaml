@@ -5,19 +5,21 @@ help_html: |
   
   <b>Main workflow</b>:
   
-  Authorize with /google(only first time), give me any file and get your link. That simple.
+  Authorize with /google(only first time), give me any file and get your link. That simple 🔥.
+
+  If you like me, give me a star 🌟, right <a href="https://github.com/B1Z0N/fonlybot">here</a>.
 
 authorized_html: Currently you are <b>authorized</b> 🟢.
 not_authorized_html: Currently you are <b>not authorized</b> 🔴(press /google to use me).
 
 language: Please, select the language.
-language_selected_html: <b>Fonly</b> speaks English now.
+language_selected_html: <b>Fonly</b> speaks English now ✅.
 
 google_signin_md: Signin [here]({0}) and paste the code below, so I could take care of everything else. 
-google_success: Successfully signed in. Try giving me some files.
-google_failure: Oops, something wrong with your code, try again.
+google_success: Successfully signed in ✅. Try giving me some files.
+google_failure: Oops, something wrong with your code ❌, try again.
 
-upload_success_md: You've successfully uploaded ["{0}"]({1}).
-upload_failure_md: Failure on "{0}"" upload, try again.
+upload_success_md: Successfully uploaded ["{0}"]({1}) ✅.
+upload_failure_md: Failure on "{0}"" upload ❌, try again.
 
 authorize_first_md: Authorize with /google before sending any docs.

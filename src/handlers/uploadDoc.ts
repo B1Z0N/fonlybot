@@ -3,7 +3,7 @@ import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import axios from 'axios'
 import { Readable } from 'stream'
-import escape from 'markdown-escape'
+import * as escape from 'markdown-escape'
 
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
@@ -27,16 +27,16 @@ export function setupUploadHandlers(
                 ctx.dbuser.token
             )
             ctx.replyWithMarkdown(
-                escape(
-                    ctx.i18n
-                        .t('upload_success_md')
-                        .replace('{0}', fileName)
-                        .replace('{1}', link)
-                )
+                ctx.i18n
+                    .t('upload_success_md')
+                    .replace('{0}', fileName)
+                    .replace('{1}', link),
+                { reply_to_message_id: ctx.message.message_id }
             )
         } catch (err) {
             ctx.replyWithMarkdown(
-                escape(ctx.i18n.t('upload_failure_md').replace('{0}', fileName))
+                ctx.i18n.t('upload_failure_md').replace('{0}', fileName),
+                { reply_to_message_id: ctx.message.message_id }
             )
             console.error(`Error on uploading file to the drive: ${err}`)
         }

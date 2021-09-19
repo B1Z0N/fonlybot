@@ -13,14 +13,17 @@ export function setupAuthHandlers(
         GOOGLE_SCENE_ID
     )
 
+    const googleEnter = (ctx: Scenes.SceneContext<Scenes.SceneSessionData>) => ctx.replyWithMarkdown(
+        ctx.i18n
+            .t('google_signin_md')
+            .replace('{0}', process.env.GOOGLE)
+    )
+
+    googleScene.enter(googleEnter)
     googleScene.on('text', async (ctx) => {
         const code = ctx.message.text
         if (code === `/${GOOGLE_COMMAND}`) {
-            ctx.replyWithMarkdown(
-                ctx.i18n
-                    .t('google_signin_md')
-                    .replace('{0}', process.env.GOOGLE)
-            )
+            googleEnter(ctx)
             return
         }
 
