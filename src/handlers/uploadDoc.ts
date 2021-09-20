@@ -3,7 +3,8 @@ import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import axios from 'axios'
 import { Readable } from 'stream'
-import * as escape from 'markdown-escape'
+
+const MAX_FILE_UPLOAD_SIZE = 20 * 1024 * 1024 // 20mb
 
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
@@ -15,9 +16,23 @@ export function setupUploadHandlers(
             return
         }
 
-        const { file_id: fileId, file_name: fileName } = ctx.message.document
+        const {
+            file_id: fileId,
+            file_name: fileName,
+            file_size: fileSize,
+        } = ctx.message.document
+
+        if (fileSize > MAX_FILE_UPLOAD_SIZE) {
+            ctx.reply(ctx.i18n.t('upload_too_big').replace('{0}', fileName), {
+                reply_to_message_id: ctx.message.message_id,
+            })
+            return
+        }
+
         try {
-            const tgFileUrl = (await ctx.telegram.getFileLink(fileId)).toString()
+            const tgFileUrl = (
+                await ctx.telegram.getFileLink(fileId)
+            ).toString()
             const response = await axios.get(tgFileUrl, {
                 responseType: 'stream',
             })

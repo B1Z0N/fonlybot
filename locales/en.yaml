@@ -20,5 +20,6 @@ google_failure: Oops, something wrong with your code ❌, try again.
 
 upload_success_md: Successfully uploaded ["{0}"]({1}) ✅.
 upload_failure_md: Failure on "{0}"" upload ❌, try again.
+upload_toobig: "{0}" is too big ❌, no more than 20mb allowed.
 
 authorize_first_md: Authorize with /google before sending any docs.
