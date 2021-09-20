@@ -19,7 +19,7 @@ google_success: Successfully signed in ✅. Try giving me some files.
 google_failure: Oops, something wrong with your code ❌, try again.
 
 upload_success_md: Successfully uploaded ["{0}"]({1}) ✅.
-upload_failure_md: Failure on "{0}"" upload ❌, try again.
-upload_toobig: "{0}" is too big ❌, no more than 20mb allowed.
+upload_failure_md: Failure on "{0}" upload ❌, try again.
+upload_too_big: The file "{0}" is too big ❌, no more than 20mb allowed.
 
 authorize_first_md: Authorize with /google before sending any docs.

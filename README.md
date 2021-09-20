@@ -3,6 +3,7 @@
 1. Clone this repo
 2. Launch the [mongo database](https://www.mongodb.com/) locally
 3. Create `.env` with the environment variables listed below
+4. Create `credentials.json` with your app credentials in google.
 4. Run `yarn install` in the root folder
 5. Run `yarn develop`
 
