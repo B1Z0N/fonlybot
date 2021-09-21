@@ -22,6 +22,7 @@ Also, please, consider looking at `.env.sample`.
 * Authorize the app in google.
 * Made it oneclick, not just send the code.
 * Get the name of the user(request scope).
+* Allow adding to groups.
 
 # License
 
