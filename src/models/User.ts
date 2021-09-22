@@ -25,7 +25,7 @@ class GoogleCredentials implements Auth.Credentials {
 
 export class User {
     @prop({ required: true, index: true, unique: true })
-    public id: number
+    public uid: number
 
     @prop({ required: true, default: 'en' })
     public language: string
@@ -41,13 +41,13 @@ const UserModel = getModelForClass(User, {
 
 // Get or create user
 export async function findUser(id: number) {
-    let user = await UserModel.findOne({ id })
+    let user = await UserModel.findOne({ uid: id })
     if (!user) {
         // Try/catch is used to avoid race conditions
         try {
-            user = await new UserModel({ id }).save()
+            user = await new UserModel({ uid: id }).save()
         } catch (err) {
-            user = await UserModel.findOne({ id })
+            user = await UserModel.findOne({ uid: id })
         }
     }
     return user

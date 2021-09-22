@@ -22,10 +22,11 @@ import { localeActions } from './handlers/language'
 
 // Other
 import { bot } from '@/helpers/bot'
-import { GoogleAuth } from '@/helpers/google'
+import { GoogleAuth } from '@/helpers/google/google'
 import { mongoConnect } from './models'
+import { log } from '@/helpers/log'
 
-;(async function main() {
+(async function main() {
     await mongoConnect()
 
     const auth = await GoogleAuth.build()
@@ -46,9 +47,9 @@ import { mongoConnect } from './models'
     bot.action(localeActions, setLanguage)
 
     // Errors
-    bot.catch(console.error)
+    bot.catch((err, ctx) => { log.error(`[u=${ctx.dbuser.uid}] ${err}`) })
 
     // Start
     await bot.launch()
-    console.info(`Bot ${bot.botInfo.username} is up and running`)
+    log.info(`Bot ${bot.botInfo.username} is up and running`)
 })()

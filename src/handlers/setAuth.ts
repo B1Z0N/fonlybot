@@ -1,6 +1,11 @@
-import { IAuthorization } from '@/helpers/google'
+import { IAuthorization } from '@/helpers/google/google'
+import { OAuthEmitter } from '@/helpers/google/callback_server'
+import { findUser } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Scenes, Telegraf } from 'telegraf'
+import { log } from '@/helpers/log'
+import * as http from 'http'
+import * as url from 'url'
 
 const GOOGLE_SCENE_ID = 'GOOGLE_AUTH_SCENE'
 const GOOGLE_COMMAND = 'google'
@@ -9,42 +14,32 @@ export function setupAuthHandlers(
     bot: Telegraf<MongoSessionContext>,
     auth: IAuthorization
 ) {
-    const googleScene = new Scenes.BaseScene<Scenes.SceneContext>(
-        GOOGLE_SCENE_ID
-    )
-
-    const googleEnter = (ctx: Scenes.SceneContext<Scenes.SceneSessionData>) => ctx.replyWithMarkdown(
-        ctx.i18n
-            .t('google_signin_md')
-            .replace('{0}', process.env.GOOGLE)
-    )
-
-    googleScene.enter(googleEnter)
-    googleScene.on('text', async (ctx) => {
-        const code = ctx.message.text
-        if (code === `/${GOOGLE_COMMAND}`) {
-            googleEnter(ctx)
-            return
-        }
-
+    OAuthEmitter.addListener('signin', async (userId, code) => {
+        const dbuser = await findUser(userId)
+        const send = (msg) => bot.telegram.sendMessage(userId, msg)
         try {
-            ctx.dbuser.credentials = await auth.getToken(code)
-            ctx.dbuser = await ctx.dbuser.save()
+            // await dbuser.update({
+            //     credentials: await auth.getToken(code),
+            //     uid: userId,
+            // })
 
-            ctx.reply(ctx.i18n.t('google_success'))
-            console.log('Successfully settled up google.')
-            ctx.scene.leave()
+            send('google_success')
         } catch (err) {
-            ctx.reply(ctx.i18n.t('google_failure'))
-            console.error(`Error on getting google auth code: ${err}.`)
-            ctx.scene.reenter()
+            send('google_failure')
+            log.error(
+                `[u='${userId}'] Error on getting google auth code: ${err}.`
+            )
         }
     })
 
-    const stage = new Scenes.Stage([googleScene])
-    bot.use(stage.middleware())
-    bot.command(
-        GOOGLE_COMMAND,
-        async (ctx) => await ctx.scene.enter(GOOGLE_SCENE_ID)
+    bot.command(GOOGLE_COMMAND, async (ctx) =>
+        ctx.replyWithMarkdown(
+            ctx.i18n
+                .t('google_signin_md')
+                .replace(
+                    '{0}',
+                    `${process.env.GOOGLE}&state=${ctx.message.chat.id}`
+                )
+        )
     )
 }

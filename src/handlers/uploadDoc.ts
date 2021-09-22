@@ -1,8 +1,9 @@
-import { IAuthorization } from '@/helpers/google'
+import { IAuthorization } from '@/helpers/google/google'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import axios from 'axios'
 import { Readable } from 'stream'
+import { log } from '@/helpers/log'
 
 const MAX_FILE_UPLOAD_SIZE = 20 * 1024 * 1024 // 20mb
 
@@ -58,7 +59,7 @@ export function setupUploadHandlers(
                 ctx.i18n.t('upload_failure_md').replace('{0}', fileName),
                 { reply_to_message_id: ctx.message.message_id }
             )
-            console.error(`Error on uploading file to the drive: ${err}`)
+            log.error(`[u=${ctx.dbuser.uid}] Error on uploading file to the drive: ${err}`)
         }
     })
 }
