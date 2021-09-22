@@ -2,9 +2,8 @@ import * as http from 'http'
 import * as url from 'url'
 import { EventEmitter } from 'events'
 
-const _del_idx = process.env.OAUTH_CB_SERVER.lastIndexOf(':')
-export const HOST = process.env.OAUTH_CB_SERVER.substring(0, _del_idx)
-export const PORT = +process.env.OAUTH_CB_SERVER.substring(_del_idx + 1)
+export const HOST =  process.env.OAUTH_CB_HOST
+export const PORT = +process.env.OAUTH_CB_PORT
 
 export const OAuthEmitter = new EventEmitter()
 
