@@ -16,10 +16,9 @@ export function setupAuthHandlers(
         const dbuser = await findUser(userId)
         const send = (msg) => bot.telegram.sendMessage(userId, msg)
         try {
-            // await dbuser.update({
-            //     credentials: await auth.getToken(code),
-            //     uid: userId,
-            // })
+            await dbuser.updateOne({
+                credentials: await auth.getToken(code),
+            })
 
             send('google_success')
         } catch (err) {
