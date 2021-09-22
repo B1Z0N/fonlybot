@@ -4,8 +4,6 @@ import { findUser } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Scenes, Telegraf } from 'telegraf'
 import { log } from '@/helpers/log'
-import * as http from 'http'
-import * as url from 'url'
 
 const GOOGLE_SCENE_ID = 'GOOGLE_AUTH_SCENE'
 const GOOGLE_COMMAND = 'google'
@@ -36,10 +34,7 @@ export function setupAuthHandlers(
         ctx.replyWithMarkdown(
             ctx.i18n
                 .t('google_signin_md')
-                .replace(
-                    '{0}',
-                    `${process.env.GOOGLE}&state=${ctx.message.chat.id}`
-                )
+                .replace('{0}', auth.getAuthUrl(ctx.message.chat.id))
         )
     )
 }

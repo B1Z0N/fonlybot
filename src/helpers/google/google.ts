@@ -4,18 +4,17 @@ import { Readable } from 'stream'
 import * as mime from 'mime-types'
 
 const SCOPES = 'https://www.googleapis.com/auth/drive'
-const REDIRECT_URL = 'urn:ietf:wg:oauth:2.0:oob'
 const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 
 export interface IAuthorization {
-    getAuthUrl: () => Promise<string>
+    getAuthUrl: (state: any) => string
     getToken: (code: string) => Promise<Auth.Credentials>
     upload: (
         token: Auth.Credentials,
         data: Readable,
         name: string,
         folderId?: string
-    ) => Promise<IUploadInfo> 
+    ) => Promise<IUploadInfo>
 }
 
 export interface IUploadInfo {
@@ -30,11 +29,11 @@ export class GoogleAuth implements IAuthorization {
         const data = await fs.readFile(CREDENTIALS_PATH)
         const { client_secret, client_id, redirect_uris } = JSON.parse(
             data.toString()
-        ).installed
+        ).web
         const oauth = new google.auth.OAuth2(
             client_id,
             client_secret,
-            REDIRECT_URL
+            redirect_uris
         )
 
         const gauth = new GoogleAuth()
@@ -43,10 +42,11 @@ export class GoogleAuth implements IAuthorization {
         return gauth
     }
 
-    async getAuthUrl() {
+    getAuthUrl(state: any) {
         return this.auth.generateAuthUrl({
             access_type: 'offline',
             scope: SCOPES,
+            state,
         })
     }
 
@@ -90,7 +90,10 @@ export class GoogleAuth implements IAuthorization {
         return { url: this.fileLinkFromId(fileRes.data.id), folderId }
     }
 
-    private static async createFolderIfNotExists(drive: drive_v3.Drive, folderId?: string) {
+    private static async createFolderIfNotExists(
+        drive: drive_v3.Drive,
+        folderId?: string
+    ) {
         if (!folderId) {
             const folderRes = await drive.files.create({
                 requestBody: {
