@@ -43,7 +43,7 @@ const UserModel = getModelForClass(User, {
 })
 
 // Get or create user
-export async function findUser(id: number) {
+export async function findOrCreateUser(id: number) {
     let user = await UserModel.findOne({ uid: id })
     if (!user) {
         // Try/catch is used to avoid race conditions
@@ -54,4 +54,7 @@ export async function findUser(id: number) {
         }
     }
     return user
+}
+export async function findUser(id: number) {
+       return	await UserModel.findOne({uid: id})
 }

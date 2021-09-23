@@ -23,3 +23,6 @@ upload_failure_md: Failure on "{0}" upload ❌, try again.
 upload_too_big: The file "{0}" is too big ❌, no more than 20mb allowed.
 
 authorize_first_md: Authorize with /google before sending any docs.
+
+site_may_close: You may now close this page :)
+site_error: Error

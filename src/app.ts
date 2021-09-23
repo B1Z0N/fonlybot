@@ -40,7 +40,7 @@ import { log } from '@/helpers/log'
     // Commands
     bot.command(['help', 'start'], sendHelp)
     bot.command('language', sendLanguage)
-    setupAuthHandlers(bot, auth)
+    await setupAuthHandlers(bot, auth)
     setupUploadHandlers(bot, auth)
 
     // Actions

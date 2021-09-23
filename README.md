@@ -25,6 +25,7 @@ Also, please, consider looking at `.env.sample`.
   * Create subfolders inside fonly folder for personal and chat docs
 * Ignore some formats like mp3, gif and other by default
 * Allow ignoring and unignoring some other formats
+* Switch to os.path.join
 
 # License
 

@@ -1,5 +1,5 @@
 import { IAuthorization } from '@/helpers/google/google'
-import { OAuthEmitter } from '@/helpers/google/callback_server'
+import { OAuthSubscribe } from '@/helpers/google/callback_server'
 import { findUser } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Scenes, Telegraf } from 'telegraf'
@@ -10,14 +10,13 @@ import { randomBytes } from 'crypto'
 const GOOGLE_SCENE_ID = 'GOOGLE_AUTH_SCENE'
 const GOOGLE_COMMAND = 'google'
 
-export function setupAuthHandlers(
+export async function setupAuthHandlers(
     bot: Telegraf<MongoSessionContext>,
     auth: IAuthorization
 ) {
-    OAuthEmitter.addListener('signin', async (state, code) => {
-	const { cid, onetimepass } = JSON.parse(state);
+    await OAuthSubscribe(async (cid, onetimepass, code) => {
         const dbuser = await findUser(cid);
-	if (dbuser.onetimepass === undefined || dbuser.onetimepass !== onetimepass) return;
+	if (!dbuser || dbuser.onetimepass === undefined || dbuser.onetimepass !== onetimepass) return 403;
 	dbuser.onetimepass = undefined
 
         const send = (msg) => bot.telegram.sendMessage(cid, i18n.t(dbuser.language, msg))
@@ -30,13 +29,15 @@ export function setupAuthHandlers(
         } catch (err) {
             send('google_failure')
             console.error(`Error on getting google auth code: ${err}.`)
+	    return 500
         }
+	return 200
     })
 
     bot.command(GOOGLE_COMMAND, async (ctx) => {
 	const onetimepass = randomBytes(20).toString('hex') 
 	const state = {
-		cid: ctx.message.chat.id, onetimepass
+		cid: ctx.message.chat.id, onetimepass, lang: ctx.dbuser.language
 	}
 	await ctx.dbuser.updateOne({ onetimepass }) 
 
