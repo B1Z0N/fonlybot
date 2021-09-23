@@ -5,6 +5,7 @@ import * as mime from 'mime-types'
 
 const SCOPES = 'https://www.googleapis.com/auth/drive'
 const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
+const FOLDER_NAME = 'fonly'
 
 export interface IAuthorization {
     getAuthUrl: (state: any) => string
@@ -97,7 +98,7 @@ export class GoogleAuth implements IAuthorization {
         if (!folderId) {
             const folderRes = await drive.files.create({
                 requestBody: {
-                    name: 'fonly_folder',
+                    name: FOLDER_NAME,
                     mimeType: 'application/vnd.google-apps.folder',
                 },
             })

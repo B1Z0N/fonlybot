@@ -19,10 +19,12 @@ Also, please, consider looking at `.env.sample`.
 
 # TODO
 
-* Authorize the app in google.
-* Made it oneclick, not just send the code.
 * Get the name of the user(request scope).
 * Allow adding to groups.
+  * Turn someone into default google driver
+  * Create subfolders inside fonly folder for personal and chat docs
+* Ignore some formats like mp3, gif and other by default
+* Allow ignoring and unignoring some other formats
 
 # License
 

@@ -32,6 +32,9 @@ export class User {
 
     @prop()
     public credentials?: GoogleCredentials
+
+    @prop()
+    onetimepass?: string
 }
 
 // Get User model

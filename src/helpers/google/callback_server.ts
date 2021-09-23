@@ -9,7 +9,7 @@ http.createServer(async (req, res) => {
     const { query } = url.parse(req.url, true);
     if (!query.code || !query.state) return
 
-    OAuthEmitter.emit('signin', +`${query.state}`, `${query.code}`)
+    OAuthEmitter.emit('signin', query.state, `${query.code}`)
 
     res.writeHead(200)
     res.end(`You\'re all setup! You may now close this window.`)
