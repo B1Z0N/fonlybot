@@ -2,12 +2,11 @@ import { IAuthorization } from '@/helpers/google/google'
 import { OAuthSubscribe } from '@/helpers/google/callback_server'
 import { findUser } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
-import { Scenes, Telegraf } from 'telegraf'
+import { Telegraf } from 'telegraf'
 import { log } from '@/helpers/log'
 import { i18n } from '@/helpers/i18n'
 import { randomBytes } from 'crypto'
 
-const GOOGLE_SCENE_ID = 'GOOGLE_AUTH_SCENE'
 const GOOGLE_COMMAND = 'google'
 
 export async function setupAuthHandlers(
@@ -28,7 +27,7 @@ export async function setupAuthHandlers(
             send('google_success')
         } catch (err) {
             send('google_failure')
-            console.error(`Error on getting google auth code: ${err}.`)
+            log.error(`[u=${cid}] Error on getting google auth code: ${err}.`)
 	    return 500
         }
 	return 200

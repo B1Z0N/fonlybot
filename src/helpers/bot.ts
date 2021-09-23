@@ -1,4 +1,4 @@
-import { Telegraf, Scenes, Context } from 'telegraf'
+import { Telegraf, Scenes } from 'telegraf'
 
 export interface MongoSessionContext extends Scenes.SceneContext {
     session: any

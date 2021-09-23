@@ -1,18 +1,16 @@
 import * as http from 'http'
 import * as url from 'url'
 import { promises as fs } from 'fs'
-import { EventEmitter } from 'events'
+
 import { i18n } from '@/helpers/i18n'
 import * as Mustache from 'mustache'
 
 export const TEMPLATE_FOLDER = `${process.cwd()}/templates`
-
 export const PORT = +process.env.CB_PORT
 
 export interface OAuthCallback {
 	(cid: number, onetimepass: string, code: string): Promise<number>
 }
-
 
 export async function OAuthSubscribe(cb: OAuthCallback) {
 

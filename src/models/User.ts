@@ -1,5 +1,4 @@
-import { prop, getModelForClass, Severity } from '@typegoose/typegoose'
-import { Schema } from 'mongoose'
+import { prop, getModelForClass } from '@typegoose/typegoose'
 import { Auth } from 'googleapis'
 
 // TODO: maybe we could generate this?
