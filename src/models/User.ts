@@ -55,5 +55,5 @@ export async function findOrCreateUser(id: number) {
     return user
 }
 export async function findUser(id: number) {
-       return	await UserModel.findOne({uid: id})
+    return await UserModel.findOne({ uid: id })
 }

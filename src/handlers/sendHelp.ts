@@ -5,7 +5,9 @@ export function sendHelp(ctx: Context) {
         ctx.i18n.t('help_html') +
             '\n' +
             ctx.i18n.t(
-                ctx.dbuser.credentials ? 'authorized_html' : 'not_authorized_html'
+                ctx.dbuser.credentials
+                    ? 'authorized_html'
+                    : 'not_authorized_html'
             )
     )
 }

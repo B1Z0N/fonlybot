@@ -1,9 +1,10 @@
 import { promises as fs } from 'fs'
-import { google, Auth, drive_v3 } from 'googleapis'
+import { google, Auth, drive_v3, people_v1 } from 'googleapis'
 import { Readable } from 'stream'
 import * as mime from 'mime-types'
+import { GaxiosResponse } from 'gaxios'
 
-const SCOPES = 'https://www.googleapis.com/auth/drive'
+const SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/userinfo.email']
 const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 const FOLDER_NAME = 'fonly'
 
@@ -16,6 +17,15 @@ export interface IAuthorization {
         name: string,
         folderId?: string
     ) => Promise<IUploadInfo>
+
+    getFolder: (
+        drive: drive_v3.Drive,
+        folderId?: string
+    ) => Promise<drive_v3.Schema$File>
+
+    getEmail: (
+        token: Auth.Credentials
+    ) => Promise<string>
 }
 
 export interface IUploadInfo {
@@ -56,6 +66,13 @@ export class GoogleAuth implements IAuthorization {
         return tokens
     }
 
+    async getEmail(token: Auth.Credentials) {
+        this.auth.setCredentials(token)
+        const people = google.people({ version: 'v1', auth: this.auth })
+        const me = await people.people.get({ resourceName: 'people/me', personFields: 'emailAddresses' })
+        return me.data.emailAddresses[0].value;
+    }
+
     async upload(
         token: Auth.Credentials,
         data: Readable,
@@ -65,7 +82,7 @@ export class GoogleAuth implements IAuthorization {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
 
-        folderId = await GoogleAuth.createFolderIfNotExists(drive, folderId)
+        folderId = (await this.getFolder(drive, folderId)).id
 
         const mimeType = this.getMimeType(name)
         const fileRes = await drive.files.create({
@@ -91,21 +108,18 @@ export class GoogleAuth implements IAuthorization {
         return { url: this.fileLinkFromId(fileRes.data.id), folderId }
     }
 
-    private static async createFolderIfNotExists(
-        drive: drive_v3.Drive,
-        folderId?: string
-    ) {
-        if (!folderId) {
-            const folderRes = await drive.files.create({
+    async getFolder(drive: drive_v3.Drive, folderId?: string) {
+        const createFolder = async () =>
+            await drive.files.create({
                 requestBody: {
                     name: FOLDER_NAME,
                     mimeType: 'application/vnd.google-apps.folder',
                 },
             })
-            folderId = folderRes.data.id
-        }
 
-        return folderId
+        return await (folderId
+            ? await drive.files.get({ fileId: folderId }).catch(createFolder)
+            : await createFolder()).data
     }
 
     private fileLinkFromId(fileId: string) {
@@ -116,3 +130,4 @@ export class GoogleAuth implements IAuthorization {
         return mime.lookup(name) || 'text/plain'
     }
 }
+

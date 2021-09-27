@@ -59,7 +59,9 @@ export function setupUploadHandlers(
                 ctx.i18n.t('upload_failure_md').replace('{0}', fileName),
                 { reply_to_message_id: ctx.message.message_id }
             )
-            log.error(`[u=${ctx.dbuser.uid}] Error on uploading file to the drive: ${err}`)
+            log.error(
+                `[u=${ctx.dbuser.uid}] Error on uploading file to the drive: ${err}`
+            )
         }
     })
 }

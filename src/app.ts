@@ -25,8 +25,7 @@ import { bot } from '@/helpers/bot'
 import { GoogleAuth } from '@/helpers/google/google'
 import { mongoConnect } from './models'
 import { log } from '@/helpers/log'
-
-(async function main() {
+;(async function main() {
     await mongoConnect()
 
     const auth = await GoogleAuth.build()
@@ -47,7 +46,9 @@ import { log } from '@/helpers/log'
     bot.action(localeActions, setLanguage)
 
     // Errors
-    bot.catch((err, ctx) => { log.error(`[u=${ctx.dbuser.uid}] ${err}`) })
+    bot.catch((err, ctx) => {
+        log.error(`[u=${ctx.dbuser.uid}] ${err}`)
+    })
 
     // Start
     await bot.launch()

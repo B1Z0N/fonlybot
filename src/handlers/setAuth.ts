@@ -14,31 +14,39 @@ export async function setupAuthHandlers(
     auth: IAuthorization
 ) {
     await OAuthSubscribe(async (cid, onetimepass, code) => {
-        const dbuser = await findUser(cid);
-	if (!dbuser || dbuser.onetimepass === undefined || dbuser.onetimepass !== onetimepass) return 403;
-	dbuser.onetimepass = undefined
+        const dbuser = await findUser(cid)
+        if (
+            !dbuser ||
+            dbuser.onetimepass === undefined ||
+            dbuser.onetimepass !== onetimepass
+        )
+            return 403
+        dbuser.onetimepass = undefined
 
-        const send = (msg) => bot.telegram.sendMessage(cid, i18n.t(dbuser.language, msg))
+        const send = (msg) =>
+            bot.telegram.sendMessage(cid, i18n.t(dbuser.language, msg))
 
         try {
             dbuser.credentials = await auth.getToken(code)
-	    await dbuser.save()
+            await dbuser.save()
 
             send('google_success')
         } catch (err) {
             send('google_failure')
             log.error(`[u=${cid}] Error on getting google auth code: ${err}.`)
-	    return 500
+            return 500
         }
-	return 200
+        return 200
     })
 
     bot.command(GOOGLE_COMMAND, async (ctx) => {
-	const onetimepass = randomBytes(20).toString('hex') 
-	const state = {
-		cid: ctx.message.chat.id, onetimepass, lang: ctx.dbuser.language
-	}
-	await ctx.dbuser.updateOne({ onetimepass }) 
+        const onetimepass = randomBytes(20).toString('hex')
+        const state = {
+            cid: ctx.message.chat.id,
+            onetimepass,
+            lang: ctx.dbuser.language,
+        }
+        await ctx.dbuser.updateOne({ onetimepass })
 
         return ctx.replyWithMarkdown(
             ctx.i18n
