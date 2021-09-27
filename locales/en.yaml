@@ -1,11 +1,6 @@
 name: English
 help_html: |
-  <b>Fonly</b>👋 allows you to upload a doc to google drive and get a link to it. 
-  It comes in handy when you don't have any docx editor installed: you can work with it online.
-  
-  <b>Main workflow</b>:
-  
-  Authorize with /google(only first time), give me any file and get your link. That simple 🔥.
+  Authorize with /google(only first time), give me any file and get your link. Yeah, that simple!
   If you like me, give me a star 🌟, right <a href="https://github.com/B1Z0N/fonlybot">here</a>.
 
 authorized_html: Currently you are <b>authorized</b> 🟢.
@@ -14,9 +9,9 @@ not_authorized_html: Currently you are <b>not authorized</b> 🔴(press /google 
 language: Please, select the language.
 language_selected_html: <b>Fonly</b> speaks English now ✅.
 
-google_signin_md: Signin [here]({0}) and paste the code below, so I could take care of everything else. 
+google_signin_md: Signin [here]({0}), so I could take care of everything else. 
 google_success: Successfully signed in ✅. Try giving me some files.
-google_failure: Oops, something wrong with your code ❌, try again.
+google_failure: Oops, something went wrong while signing in❌, try again.
 
 upload_success_md: Successfully uploaded ["{0}"]({1}) ✅.
 upload_failure_md: Failure on "{0}" upload ❌, try again.

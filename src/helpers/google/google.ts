@@ -4,9 +4,26 @@ import { Readable } from 'stream'
 import * as mime from 'mime-types'
 import { GaxiosResponse } from 'gaxios'
 
-const SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/userinfo.email']
+const SCOPES = [
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
 const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 const FOLDER_NAME = 'fonly'
+
+export abstract class Utils {
+    public static mimeType(name: string) {
+        return mime.lookup(name) || 'text/plain'
+    }
+
+    public static privateFolderLinkFromId(folderId: string) {
+        return `https://drive.google.com/drive/u/1/folders/${folderId}`
+    }
+    public static sharedFileLinkFromId(fileId: string) {
+        return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
+    }
+}
 
 export interface IAuthorization {
     getAuthUrl: (state: any) => string
@@ -19,13 +36,11 @@ export interface IAuthorization {
     ) => Promise<IUploadInfo>
 
     getFolder: (
-        drive: drive_v3.Drive,
+        token: Auth.Credentials,
         folderId?: string
     ) => Promise<drive_v3.Schema$File>
 
-    getEmail: (
-        token: Auth.Credentials
-    ) => Promise<string>
+    getEmail: (token: Auth.Credentials) => Promise<string>
 }
 
 export interface IUploadInfo {
@@ -69,8 +84,11 @@ export class GoogleAuth implements IAuthorization {
     async getEmail(token: Auth.Credentials) {
         this.auth.setCredentials(token)
         const people = google.people({ version: 'v1', auth: this.auth })
-        const me = await people.people.get({ resourceName: 'people/me', personFields: 'emailAddresses' })
-        return me.data.emailAddresses[0].value;
+        const me = await people.people.get({
+            resourceName: 'people/me',
+            personFields: 'emailAddresses',
+        })
+        return me.data.emailAddresses[0].value
     }
 
     async upload(
@@ -82,9 +100,9 @@ export class GoogleAuth implements IAuthorization {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
 
-        folderId = (await this.getFolder(drive, folderId)).id
+        folderId = (await this.getFolderByDrive(drive, folderId)).id
 
-        const mimeType = this.getMimeType(name)
+        const mimeType = Utils.mimeType(name)
         const fileRes = await drive.files.create({
             requestBody: {
                 name,
@@ -105,10 +123,10 @@ export class GoogleAuth implements IAuthorization {
             },
         })
 
-        return { url: this.fileLinkFromId(fileRes.data.id), folderId }
+        return { url: Utils.sharedFileLinkFromId(fileRes.data.id), folderId }
     }
 
-    async getFolder(drive: drive_v3.Drive, folderId?: string) {
+    private async getFolderByDrive(drive: drive_v3.Drive, folderId: string) {
         const createFolder = async () =>
             await drive.files.create({
                 requestBody: {
@@ -119,15 +137,13 @@ export class GoogleAuth implements IAuthorization {
 
         return await (folderId
             ? await drive.files.get({ fileId: folderId }).catch(createFolder)
-            : await createFolder()).data
+            : await createFolder()
+        ).data
     }
 
-    private fileLinkFromId(fileId: string) {
-        return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
-    }
-
-    private getMimeType(name: string) {
-        return mime.lookup(name) || 'text/plain'
+    async getFolder(token: Auth.Credentials, folderId?: string) {
+        this.auth.setCredentials(token)
+        const drive = google.drive({ version: 'v3', auth: this.auth })
+        return await this.getFolderByDrive(drive, folderId)
     }
 }
-

@@ -12,7 +12,7 @@ import { getMongoSession } from '@/middlewares/mongoSession'
 import { attachUser } from '@/middlewares/attachUser'
 
 // Commands
-import { sendHelp } from '@/handlers/sendHelp'
+import { setHelp } from '@/handlers/setHelp'
 import { setupAuthHandlers } from './handlers/setAuth'
 import { setupUploadHandlers } from './handlers/uploadDoc'
 import { setLanguage, sendLanguage } from '@/handlers/language'
@@ -37,7 +37,7 @@ import { log } from '@/helpers/log'
     bot.use(getMongoSession())
 
     // Commands
-    bot.command(['help', 'start'], sendHelp)
+    await setHelp(bot, auth)
     bot.command('language', sendLanguage)
     await setupAuthHandlers(bot, auth)
     setupUploadHandlers(bot, auth)
