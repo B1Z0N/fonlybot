@@ -23,16 +23,14 @@ export async function setupAuthHandlers(
             return 403
         dbuser.onetimepass = undefined
 
-        const send = (msg) =>
-            bot.telegram.sendMessage(cid, i18n.t(dbuser.language, msg))
-
         try {
             dbuser.credentials = await auth.getToken(code)
             await dbuser.save()
 
-            send('google_success')
+	    const email = await auth.getEmail(dbuser.credentials)
+            bot.telegram.sendMessage(cid, i18n.t(dbuser.language, 'google_success').replace('{email}', email))
         } catch (err) {
-            send('google_failure')
+            bot.telegram.sendMessage(cid, i18n.t(dbuser.language, 'google_failure'))
             log.error(`[u=${cid}] Error on getting google auth code: ${err}.`)
             return 500
         }

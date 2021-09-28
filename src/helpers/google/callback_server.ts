@@ -33,17 +33,17 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
         if (httpCode >= 200 && httpCode <= 299) {
             res.end(
                 template({
-                    message: i18n.t(lang, 'google_success'),
-                    window_close: i18n.t(lang, 'site_may_close'),
+                    message: i18n.t(lang, 'google_success_site'),
+                    window_close: i18n.t(lang, 'may_close_site'),
                 })
             )
         } else if (httpCode >= 400 && httpCode <= 599) {
             res.end(
                 template({
                     error_code: httpCode,
-                    error: i18n.t(lang, 'site_error'),
-                    message: i18n.t(lang, 'google_failure'),
-                    window_close: i18n.t(lang, 'site_may_close'),
+                    error: i18n.t(lang, 'error_site'),
+                    message: i18n.t(lang, 'google_failure_site'),
+                    window_close: i18n.t(lang, 'may_close_site'),
                 })
             )
         }

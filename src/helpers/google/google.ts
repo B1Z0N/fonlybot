@@ -1,8 +1,7 @@
 import { promises as fs } from 'fs'
-import { google, Auth, drive_v3, people_v1 } from 'googleapis'
+import { google, Auth, drive_v3 } from 'googleapis'
 import { Readable } from 'stream'
 import * as mime from 'mime-types'
-import { GaxiosResponse } from 'gaxios'
 
 const SCOPES = [
     'https://www.googleapis.com/auth/drive',
@@ -17,10 +16,10 @@ export abstract class Utils {
         return mime.lookup(name) || 'text/plain'
     }
 
-    public static privateFolderLinkFromId(folderId: string) {
+    public static privateFolderLink(folderId: string) {
         return `https://drive.google.com/drive/u/1/folders/${folderId}`
     }
-    public static sharedFileLinkFromId(fileId: string) {
+    public static sharedFileLink(fileId: string) {
         return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
     }
 }
@@ -123,7 +122,7 @@ export class GoogleAuth implements IAuthorization {
             },
         })
 
-        return { url: Utils.sharedFileLinkFromId(fileRes.data.id), folderId }
+        return { url: Utils.sharedFileLink(fileRes.data.id), folderId }
     }
 
     private async getFolderByDrive(drive: drive_v3.Drive, folderId: string) {
@@ -147,3 +146,4 @@ export class GoogleAuth implements IAuthorization {
         return await this.getFolderByDrive(drive, folderId)
     }
 }
+

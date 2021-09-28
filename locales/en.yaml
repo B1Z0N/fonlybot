@@ -1,16 +1,19 @@
 name: English
 help_html: |
-  Authorize with /google(only first time), give me any file and get your link. Yeah, that simple!
+  Authorize with /google for the first time, give me any file and get your link. Yeah, that simple!
   If you like me, give me a star 🌟, right <a href="https://github.com/B1Z0N/fonlybot">here</a>.
 
-authorized_html: Currently you are <b>authorized</b> 🟢.
-not_authorized_html: Currently you are <b>not authorized</b> 🔴(press /google to use me).
+authorized_html: |
+  Currently you are authorized as {email} 🟢. 
+  Here is your <a href="{folder}">fonly folder</a>.
+
+not_authorized_html: Currently you are not authorized 🔴.
 
 language: Please, select the language.
 language_selected_html: <b>Fonly</b> speaks English now ✅.
 
 google_signin_md: Signin [here]({0}), so I could take care of everything else. 
-google_success: Successfully signed in ✅. Try giving me some files.
+google_success: Successfully signed in as {email} ✅. Try giving me some files.
 google_failure: Oops, something went wrong while signing in❌, try again.
 
 upload_success_md: Successfully uploaded ["{0}"]({1}) ✅.
@@ -19,5 +22,7 @@ upload_too_big: The file "{0}" is too big ❌, no more than 20mb allowed.
 
 authorize_first_md: Authorize with /google before sending any docs.
 
-site_may_close: You may now close this page :)
-site_error: Error
+may_close_site: You may now close this page :)
+error_site: Error
+google_success_site: Successfully signed in ✅. Try giving me some files.
+google_failure_site: Oops, something went wrong while signing in❌, try again.
