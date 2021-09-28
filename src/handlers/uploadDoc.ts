@@ -14,7 +14,6 @@ export function setupUploadHandlers(
     ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
     bot.on('document', async (ctx) => {
-	console.log(ctx.message.document.mime_type)
         if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
         if (!ctx.dbuser.credentials) {
             ctx.replyWithMarkdown(ctx.i18n.t('authorize_first_md'))
