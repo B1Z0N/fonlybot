@@ -5,7 +5,7 @@ import { promises as fs } from 'fs'
 import { i18n } from '@/helpers/i18n'
 import * as Mustache from 'mustache'
 
-export const TEMPLATE_FOLDER = `${process.cwd()}/templates`
+export const TEMPLATE_FOLDER = `${process.cwd()}/static/templates`
 export const PORT = +process.env.CB_PORT
 
 export interface OAuthCallback {
