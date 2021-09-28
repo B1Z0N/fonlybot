@@ -10,26 +10,30 @@ export function setHelp(bot: Telegraf, auth: GoogleAuth) {
         } else {
             const email = await auth.getEmail(ctx.dbuser.credentials)
             const folder = await auth.getFolder(
-                    ctx.dbuser.credentials,
-                    ctx.dbuser.credentials.folderId
-                )
+                ctx.dbuser.credentials,
+                ctx.dbuser.credentials.folderId
+            )
             const folderLink = Utils.privateFolderLink(folder.id)
 
             ctx.dbuser.credentials.folderId = folder.id
             ctx.dbuser = await ctx.dbuser.save()
 
-            msg += ctx.i18n.t('authorized_html').replace('{email}', email).replace('{folder}', folderLink)
+            msg += ctx.i18n
+                .t('authorized_html')
+                .replace('{email}', email)
+                .replace('{folder}', folderLink)
         }
 
-	return msg
+        return msg
     }
 
     bot.command('help', async (ctx) => ctx.replyWithHTML(await genHTMLMsg(ctx)))
     bot.command('start', async (ctx) => {
-	    const msg = await genHTMLMsg(ctx)
-	    const userMention = `<a href="tg://user?id=${ctx.from.id}">${ctx.from.first_name}</a>`
-await ctx.replyWithHTML(ctx.i18n.t('hello_html').replace('{name}', userMention))
-await ctx.replyWithHTML(msg)
+        const msg = await genHTMLMsg(ctx)
+        const userMention = `<a href="tg://user?id=${ctx.from.id}">${ctx.from.first_name}</a>`
+        await ctx.replyWithHTML(
+            ctx.i18n.t('hello_html').replace('{name}', userMention)
+        )
+        await ctx.replyWithHTML(msg)
     })
 }
-
