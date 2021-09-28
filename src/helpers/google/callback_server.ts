@@ -17,9 +17,16 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
         `${TEMPLATE_FOLDER}/result.html`
     )}`
     const template = (view) => Mustache.render(templateHTML, view)
-
+    const index = `${await fs.readFile(`${TEMPLATE_FOLDER}/index.html`)}`
     http.createServer(async (req, res) => {
-        const { query } = url.parse(req.url, true)
+        const { query, path } = url.parse(req.url, true)
+
+	if (path == '/')
+	{
+	    res.writeHead(200)
+	    res.end(index)
+	    return
+	}
 
         if (!query || !query.code || !query.state) {
             res.end()

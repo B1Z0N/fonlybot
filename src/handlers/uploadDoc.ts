@@ -6,12 +6,16 @@ import { Readable } from 'stream'
 import { log } from '@/helpers/log'
 
 const MAX_FILE_UPLOAD_SIZE = 20 * 1024 * 1024 // 20mb
+const IGNORED_MIME_TYPES = new Set(['image/jpeg', 'image/gif', 'image/png', 'audio/mpeg', 'video/quicktime', 'video/mp4', 'image/webp'])
 
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
-    auth: IAuthorization
+    auth: IAuthorization,
+    ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
     bot.on('document', async (ctx) => {
+	console.log(ctx.message.document.mime_type)
+        if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
         if (!ctx.dbuser.credentials) {
             ctx.replyWithMarkdown(ctx.i18n.t('authorize_first_md'))
             return
@@ -65,3 +69,4 @@ export function setupUploadHandlers(
         }
     })
 }
+
