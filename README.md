@@ -19,13 +19,14 @@ Also, please, consider looking at `.env.sample`.
 
 # TODO
 
-* Get the name of the user(request scope).
 * Allow adding to groups.
   * Turn someone into default google driver
   * Create subfolders inside fonly folder for personal and chat docs
-* Ignore some formats like mp3, gif and other by default
-* Allow ignoring and unignoring some other formats
 * Switch to os.path.join
+* App verification by google(in progress)
+* Add admin commands
+* Refactor code
+* Add more languages to i18n
 
 # License
 
