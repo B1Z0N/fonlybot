@@ -14,7 +14,7 @@ export interface OAuthCallback {
 
 export async function OAuthSubscribe(cb: OAuthCallback) {
     const templateHTML = `${await fs.readFile(
-        `${TEMPLATE_FOLDER}/template.html`
+        `${TEMPLATE_FOLDER}/result.html`
     )}`
     const template = (view) => Mustache.render(templateHTML, view)
 
