@@ -146,4 +146,3 @@ export class GoogleAuth implements IAuthorization {
         return await this.getFolderByDrive(drive, folderId)
     }
 }
-

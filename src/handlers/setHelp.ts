@@ -2,7 +2,7 @@ import { GoogleAuth, Utils } from '@/helpers/google/google'
 import { Context, Telegraf } from 'telegraf'
 
 export function setHelp(bot: Telegraf, auth: GoogleAuth) {
-    bot.command(['help', 'start'], async (ctx) => {
+    const genHTMLMsg = async (ctx) => {
         let msg = `${ctx.i18n.t('help_html')}\n`
 
         if (!ctx.dbuser.credentials) {
@@ -21,7 +21,15 @@ export function setHelp(bot: Telegraf, auth: GoogleAuth) {
             msg += ctx.i18n.t('authorized_html').replace('{email}', email).replace('{folder}', folderLink)
         }
 
-        ctx.replyWithHTML(msg)
+	return msg
+    }
+
+    bot.command('help', async (ctx) => ctx.replyWithHTML(await genHTMLMsg(ctx)))
+    bot.command('start', async (ctx) => {
+	    const msg = await genHTMLMsg(ctx)
+	    const userMention = `<a href="tg://user?id=${ctx.from.id}">${ctx.from.first_name}</a>`
+await ctx.replyWithHTML(ctx.i18n.t('hello_html').replace('{name}', userMention))
+await ctx.replyWithHTML(msg)
     })
 }
 

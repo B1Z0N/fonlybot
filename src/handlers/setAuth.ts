@@ -27,10 +27,18 @@ export async function setupAuthHandlers(
             dbuser.credentials = await auth.getToken(code)
             await dbuser.save()
 
-	    const email = await auth.getEmail(dbuser.credentials)
-            bot.telegram.sendMessage(cid, i18n.t(dbuser.language, 'google_success').replace('{email}', email))
+            const email = await auth.getEmail(dbuser.credentials)
+            bot.telegram.sendMessage(
+                cid,
+                i18n
+                    .t(dbuser.language, 'google_success')
+                    .replace('{email}', email)
+            )
         } catch (err) {
-            bot.telegram.sendMessage(cid, i18n.t(dbuser.language, 'google_failure'))
+            bot.telegram.sendMessage(
+                cid,
+                i18n.t(dbuser.language, 'google_failure')
+            )
             log.error(`[u=${cid}] Error on getting google auth code: ${err}.`)
             return 500
         }
