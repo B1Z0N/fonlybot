@@ -34,16 +34,13 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
             res.end(
                 template({
                     message: i18n.t(lang, 'google_success_site'),
-                    window_close: i18n.t(lang, 'may_close_site'),
                 })
             )
         } else if (httpCode >= 400 && httpCode <= 599) {
             res.end(
                 template({
-                    error_code: httpCode,
-                    error: i18n.t(lang, 'error_site'),
+                    error: `${i18n.t(lang, 'error_site')} ${httpCode}`,
                     message: i18n.t(lang, 'google_failure_site'),
-                    window_close: i18n.t(lang, 'may_close_site'),
                 })
             )
         }

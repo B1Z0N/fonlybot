@@ -24,7 +24,6 @@ upload_too_big: The file "{0}" is too big ❌, no more than 20mb allowed.
 
 authorize_first_md: Authorize with /google before sending any docs.
 
-may_close_site: You may now close this page :)
 error_site: Error
-google_success_site: Successfully signed in ✅. Try giving me some files.
-google_failure_site: Oops, something went wrong while signing in❌, try again.
+google_success_site: Successfully signed in ✅. Try giving me some files. You may now close this page :)
+google_failure_site: Oops, something went wrong while signing in❌, try again. You may now close this page :)
