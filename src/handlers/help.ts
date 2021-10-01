@@ -1,7 +1,7 @@
 import { GoogleAuth, Utils } from '@/helpers/google/google'
 import { Context, Telegraf } from 'telegraf'
 
-export function setHelp(bot: Telegraf, auth: GoogleAuth) {
+export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
     const genHTMLMsg = async (ctx) => {
         let msg = `${ctx.i18n.t('help_html')}\n`
 

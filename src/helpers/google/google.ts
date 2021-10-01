@@ -11,19 +11,6 @@ const SCOPES = [
 const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 const FOLDER_NAME = 'fonly'
 
-export abstract class Utils {
-    public static mimeType(name: string) {
-        return mime.lookup(name) || 'text/plain'
-    }
-
-    public static privateFolderLink(folderId: string) {
-        return `https://drive.google.com/drive/u/1/folders/${folderId}`
-    }
-    public static sharedFileLink(fileId: string) {
-        return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
-    }
-}
-
 export interface IAuthorization {
     getAuthUrl: (state: any) => string
     getToken: (code: string) => Promise<Auth.Credentials>
@@ -144,5 +131,18 @@ export class GoogleAuth implements IAuthorization {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
         return await this.getFolderByDrive(drive, folderId)
+    }
+}
+
+export abstract class Utils {
+    public static mimeType(name: string) {
+        return mime.lookup(name) || 'text/plain'
+    }
+
+    public static privateFolderLink(folderId: string) {
+        return `https://drive.google.com/drive/u/1/folders/${folderId}`
+    }
+    public static sharedFileLink(fileId: string) {
+        return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
     }
 }

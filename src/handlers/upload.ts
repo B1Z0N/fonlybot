@@ -6,7 +6,15 @@ import { Readable } from 'stream'
 import { log } from '@/helpers/log'
 
 const MAX_FILE_UPLOAD_SIZE = 20 * 1024 * 1024 // 20mb
-const IGNORED_MIME_TYPES = new Set(['image/jpeg', 'image/gif', 'image/png', 'audio/mpeg', 'video/quicktime', 'video/mp4', 'image/webp'])
+const IGNORED_MIME_TYPES = new Set([
+    'image/jpeg',
+    'image/gif',
+    'image/png',
+    'audio/mpeg',
+    'video/quicktime',
+    'video/mp4',
+    'image/webp',
+])
 
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
@@ -68,4 +76,3 @@ export function setupUploadHandlers(
         }
     })
 }
-

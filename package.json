@@ -1,55 +1,56 @@
 {
-  "name": "fonlybot",
-  "version": "1.0.0",
-  "description": "A friendly little bot to view your docs in google drive.",
-  "main": "dist/app.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/B1Z0N/fonlybot.git"
-  },
-  "author": "Nikolay Fedurko <kolausf@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/B1Z0N/fonlybot/issues"
-  },
-  "homepage": "https://github.com/B1Z0N/fonlybot#readme",
-  "private": false,
-  "keywords": [
-    "bot",
-    "telegram",
-    "google",
-    "gdrive",
-    "gdocs"
-  ],
-  "scripts": {
-    "distribute": "yarn build-ts && node dist/app.js",
-    "develop": "concurrently -k -i -p \"[{name}]\" -n \"Node,TypeScript\" -c \"yellow.bold,cyan.bold\" \"yarn watch-js\" \"yarn watch-ts\"",
-    "build-ts": "tsc --skipLibCheck",
-    "watch-ts": "tsc -w --skipLibCheck",
-    "watch-js": "nodemon dist/app.js"
-  },
-  "dependencies": {
-    "@typegoose/typegoose": "^8.3.0",
-    "axios": "^0.21.4",
-    "dotenv": "^10.0.0",
-    "googleapis": "^87.0.0",
-    "mime-types": "^2.1.32",
-    "module-alias": "^2.2.2",
-    "mongoose": "^6.0.6",
-    "mustache": "^4.2.0",
-    "telegraf": "^4.4.2",
-    "telegraf-i18n": "^6.6.0",
-    "telegraf-session-mongodb": "^2.0.2",
-    "typescript": "^4.4.3",
-    "winston": "^3.3.3"
-  },
-  "devDependencies": {
-    "concurrently": "^6.2.1",
-    "nodemon": "^2.0.12",
-    "prettier": "^2.4.1",
-    "yarn": "^1.22.11"
-  },
-  "_moduleAliases": {
-    "@": "dist"
-  }
+    "name": "fonlybot",
+    "version": "1.0.0",
+    "description": "A friendly little bot to view your docs in google drive.",
+    "main": "dist/app.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/B1Z0N/fonlybot.git"
+    },
+    "author": "Nikolay Fedurko <kolausf@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/B1Z0N/fonlybot/issues"
+    },
+    "homepage": "https://github.com/B1Z0N/fonlybot#readme",
+    "private": false,
+    "keywords": [
+        "bot",
+        "telegram",
+        "google",
+        "gdrive",
+        "gdocs"
+    ],
+    "scripts": {
+        "distribute": "yarn build-ts && node dist/app.js",
+        "develop": "concurrently -k -i -p \"[{name}]\" -n \"Node,TypeScript\" -c \"yellow.bold,cyan.bold\" \"yarn watch-js\" \"yarn watch-ts\"",
+        "build-ts": "tsc --skipLibCheck",
+        "watch-ts": "tsc -w --skipLibCheck",
+        "watch-js": "nodemon dist/app.js"
+    },
+    "dependencies": {
+        "@typegoose/typegoose": "^8.3.0",
+        "axios": "^0.21.4",
+        "dotenv": "^10.0.0",
+        "fastify": "^3.22.0",
+        "googleapis": "^87.0.0",
+        "mime-types": "^2.1.32",
+        "module-alias": "^2.2.2",
+        "mongoose": "^6.0.6",
+        "mustache": "^4.2.0",
+        "telegraf": "^4.4.2",
+        "telegraf-i18n": "^6.6.0",
+        "telegraf-session-mongodb": "^2.0.2",
+        "typescript": "^4.4.3",
+        "winston": "^3.3.3"
+    },
+    "devDependencies": {
+        "concurrently": "^6.2.1",
+        "nodemon": "^2.0.12",
+        "prettier": "^2.4.1",
+        "yarn": "^1.22.11"
+    },
+    "_moduleAliases": {
+        "@": "dist"
+    }
 }
