@@ -1,6 +1,6 @@
 import { IAuthorization } from '@/helpers/google/google'
 import { OAuthSubscribe } from '@/helpers/google/server'
-import { findUser } from '@/models'
+import { Chat } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import { log } from '@/helpers/log'
@@ -14,32 +14,32 @@ export async function setupAuthHandlers(
     auth: IAuthorization
 ) {
     await OAuthSubscribe(async (cid, onetimepass, code) => {
-        const dbuser = await findUser(cid)
+        const dbchat = await Chat.find(cid)
         if (
-            !dbuser ||
-            dbuser.onetimepass === undefined ||
-            dbuser.onetimepass !== onetimepass
+            !dbchat ||
+            dbchat.onetimepass === undefined ||
+            dbchat.onetimepass !== onetimepass
         )
             return 403
-        dbuser.onetimepass = undefined
+        dbchat.onetimepass = undefined
 
         try {
-            dbuser.credentials = await auth.getToken(code)
-            await dbuser.save()
+            dbchat.credentials = await auth.getToken(code)
+            await dbchat.save()
 
-            const email = await auth.getEmail(dbuser.credentials)
+            const email = await auth.getEmail(dbchat.credentials)
             bot.telegram.sendMessage(
                 cid,
                 i18n
-                    .t(dbuser.language, 'google_success')
+                    .t(dbchat.language, 'google_success')
                     .replace('{email}', email)
             )
         } catch (err) {
             bot.telegram.sendMessage(
                 cid,
-                i18n.t(dbuser.language, 'google_failure')
+                i18n.t(dbchat.language, 'google_failure')
             )
-            log.error(`[u=${cid}] Error on getting google auth code: ${err}.`)
+            log.error(`[c=${cid}] Error on getting google auth code: ${err}.`)
             return 500
         }
         return 200
@@ -50,9 +50,9 @@ export async function setupAuthHandlers(
         const state = {
             cid: ctx.message.chat.id,
             onetimepass,
-            lang: ctx.dbuser.language,
+            lang: ctx.dbchat.language,
         }
-        await ctx.dbuser.updateOne({ onetimepass })
+        await ctx.dbchat.updateOne({ onetimepass })
 
         return ctx.replyWithMarkdown(
             ctx.i18n

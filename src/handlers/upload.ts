@@ -23,7 +23,7 @@ export function setupUploadHandlers(
 ) {
     bot.on('document', async (ctx) => {
         if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
-        if (!ctx.dbuser.credentials) {
+        if (!ctx.dbchat.credentials) {
             ctx.replyWithMarkdown(ctx.i18n.t('authorize_first_md'))
             return
         }
@@ -49,14 +49,14 @@ export function setupUploadHandlers(
                 responseType: 'stream',
             })
             const { url: googleFileUrl, folderId } = await auth.upload(
-                ctx.dbuser.credentials,
+                ctx.dbchat.credentials,
                 response.data as Readable,
                 fileName,
-                ctx.dbuser.credentials.folderId
+                ctx.dbchat.credentials.folderId
             )
 
-            ctx.dbuser.credentials.folderId = folderId
-            ctx.dbuser = await ctx.dbuser.save()
+            ctx.dbchat.credentials.folderId = folderId
+            ctx.dbchat = await ctx.dbchat.save()
 
             ctx.replyWithMarkdown(
                 ctx.i18n
@@ -71,7 +71,7 @@ export function setupUploadHandlers(
                 { reply_to_message_id: ctx.message.message_id }
             )
             log.error(
-                `[u=${ctx.dbuser.uid}] Error on uploading file to the drive: ${err}`
+                `[c=${ctx.dbchat.uid}] Error on uploading file to the drive: ${err}`
             )
         }
     })

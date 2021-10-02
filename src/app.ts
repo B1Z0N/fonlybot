@@ -47,7 +47,7 @@ import { log } from '@/helpers/log'
 
     // Errors
     bot.catch((err, ctx) => {
-        log.error(`[u=${ctx.dbuser.uid}] ${err}`)
+        log.error(`[c=${ctx.dbchat.uid}] ${err}`)
     })
 
     // Start

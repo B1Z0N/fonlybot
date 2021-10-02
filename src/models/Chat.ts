@@ -22,7 +22,10 @@ class GoogleCredentials implements Auth.Credentials {
     public folderId?: string
 }
 
-export class User {
+export class Chat {
+    
+    // data
+
     @prop({ required: true, index: true, unique: true })
     public uid: number
 
@@ -34,26 +37,32 @@ export class User {
 
     @prop()
     onetimepass?: string
-}
 
-// Get User model
-const UserModel = getModelForClass(User, {
-    schemaOptions: { timestamps: true },
-})
+    @prop({ default: true })
+    on: boolean
 
-// Get or create user
-export async function findOrCreateUser(id: number) {
-    let user = await UserModel.findOne({ uid: id })
-    if (!user) {
-        // Try/catch is used to avoid race conditions
-        try {
-            user = await new UserModel({ uid: id }).save()
-        } catch (err) {
-            user = await UserModel.findOne({ uid: id })
+    // actions
+
+    private static Model = getModelForClass(Chat, {
+        schemaOptions: { timestamps: true },
+    })
+
+    public static async findOrCreate(id: number) {
+        let chat = await Chat.Model.findOne({ uid: id })
+        if (!chat) {
+            // Try/catch is used to avoid race conditions
+            try {
+                chat = await new Chat.Model({ uid: id }).save()
+            } catch (err) {
+                chat = await Chat.Model.findOne({ uid: id })
+            }
         }
+        
+        return chat
     }
-    return user
+
+    public static find(id: number) {
+        return Chat.Model.findOne({ uid: id })
+    }
 }
-export async function findUser(id: number) {
-    return await UserModel.findOne({ uid: id })
-}
+

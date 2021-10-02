@@ -9,10 +9,10 @@ export function sendLanguage(ctx: Context) {
 }
 
 export async function setLanguage(ctx: Context) {
-    let user = ctx.dbuser
+    let chat = ctx.dbchat
     if ('data' in ctx.callbackQuery) {
-        user.language = ctx.callbackQuery.data
-        user = await (user as any).save()
+        chat.language = ctx.callbackQuery.data
+        chat = await (chat as any).save()
         const message = ctx.callbackQuery.message
 
         const anyI18N = ctx.i18n as any

@@ -5,18 +5,18 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
     const genHTMLMsg = async (ctx) => {
         let msg = `${ctx.i18n.t('help_html')}\n`
 
-        if (!ctx.dbuser.credentials) {
+        if (!ctx.dbchat.credentials) {
             msg += ctx.i18n.t('not_authorized_html')
         } else {
-            const email = await auth.getEmail(ctx.dbuser.credentials)
+            const email = await auth.getEmail(ctx.dbchat.credentials)
             const folder = await auth.getFolder(
-                ctx.dbuser.credentials,
-                ctx.dbuser.credentials.folderId
+                ctx.dbchat.credentials,
+                ctx.dbchat.credentials.folderId
             )
             const folderLink = Utils.privateFolderLink(folder.id)
 
-            ctx.dbuser.credentials.folderId = folder.id
-            ctx.dbuser = await ctx.dbuser.save()
+            ctx.dbchat.credentials.folderId = folder.id
+            ctx.dbchat = await ctx.dbchat.save()
 
             msg += ctx.i18n
                 .t('authorized_html')

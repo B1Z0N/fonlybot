@@ -7,4 +7,4 @@ export async function mongoConnect() {
     await mongoose.connect(process.env.MONGO)
 }
 
-export * from './User'
+export * from './Chat'

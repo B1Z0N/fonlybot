@@ -7,7 +7,7 @@ export async function ignoreOldMessageUpdates(ctx: Context, next: () => any) {
             return next()
         } else {
             log.info(
-                `[u=${ctx.from.id}][dt=${ctx.message.date}] Ignoring message`
+                `[c=${ctx.from.id}][dt=${ctx.message.date}] Ignoring message`
             )
         }
     } else {
