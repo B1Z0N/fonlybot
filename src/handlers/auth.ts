@@ -1,5 +1,5 @@
 import { IAuthorization } from '@/helpers/google/google'
-import { OAuthSubscribe } from '@/helpers/google/callback_server'
+import { OAuthSubscribe } from '@/helpers/google/server'
 import { findUser } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'

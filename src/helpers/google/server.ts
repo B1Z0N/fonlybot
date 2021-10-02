@@ -14,6 +14,11 @@ export interface OAuthCallback {
     (cid: number, onetimepass: string, code: string): Promise<number>
 }
 
+interface ICallbackQuerystring {
+  code: string;
+  state: string;
+}
+
 export async function OAuthSubscribe(cb: OAuthCallback) {
     const templateHTML = `${await fs.readFile(
         `${TEMPLATE_FOLDER}/result.html`
@@ -23,30 +28,24 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
     const pp = `${await fs.readFile(`${TEMPLATE_FOLDER}/privacy_policy.html`)}`
 
     const app = Fastify({})
-
+    
+    // landing
     app.get('/', (request, reply) => {
         reply.type('text/html').code(200).send(index)
     })
 
+    // privacy policy
     app.get('/pp', (request, reply) => {
         reply.type('text/html').code(200).send(pp)
     })
 
-    app.route({
-        method: 'GET',
-        url: '/',
-        schema: {
-            querystring: {
-                code: { type: 'string' },
-                state: { type: 'string' },
-            },
-        },
-        handler: async (request, reply) => {
-            const { code, state } = request.query as any
+    // OAuth callback handler
+    app.get<{ Querystring: ICallbackQuerystring }>('/cb', async (request, reply) => {
+            const { code, state } = request.query
             const { cid, onetimepass, lang } = JSON.parse(`${state}`)
             const httpCode = await cb(cid, onetimepass, `${code}`)
 
-            reply.code(httpCode)
+            reply.type('text/html').code(httpCode)
 
             if (httpCode >= 200 && httpCode <= 299) {
                 reply.send(
@@ -62,8 +61,10 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
                     })
                 )
             }
-        },
-    })
+        }
+    )
+
+
 
     app.listen(PORT, (err, address) => {
         if (err) {
