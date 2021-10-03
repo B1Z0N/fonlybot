@@ -1,6 +1,7 @@
+import { chatAdminsOrSignedInComposer } from '@/helpers/chatAdmin'
 import { IAuthorization } from '@/helpers/google/google'
 import { MongoSessionContext } from '@/helpers/bot'
-import { Telegraf } from 'telegraf'
+import { Telegraf, Composer } from 'telegraf'
 import axios from 'axios'
 import { Readable } from 'stream'
 import { log } from '@/helpers/log'
@@ -16,12 +17,22 @@ const IGNORED_MIME_TYPES = new Set([
     'image/webp',
 ])
 
+
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
     auth: IAuthorization,
     ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
-    bot.on('document', async (ctx) => {
+    bot.command('on', Composer.admin(async ctx => {
+        await ctx.dbchat.updateOne({ active: false })
+    }))
+
+    bot.command('off', Composer.admin(async ctx => {
+        await ctx.dbchat.updateOne({ active: true })
+    }))
+
+    bot.on('document', async ctx => {
+        if (ctx.dbchat.active) return
         if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
         if (!ctx.dbchat.credentials) {
             ctx.replyWithMarkdown(ctx.i18n.t('authorize_first_md'))

@@ -1,14 +1,19 @@
-import { Context, Markup as m } from 'telegraf'
+import { Composer, Context, Markup as m, Telegraf } from 'telegraf'
 import { readdirSync, readFileSync } from 'fs'
 import { safeLoad } from 'js-yaml'
 
-export const localeActions = localesFiles().map((file) => file.split('.')[0])
+export function setupLanguageHandlers(bot: Telegraf) {
+    bot.command('lang', Composer.admin(sendLanguage))
+    bot.action(localeActions, setLanguage)
+}
 
-export function sendLanguage(ctx: Context) {
+const localeActions = localesFiles().map((file) => file.split('.')[0])
+
+function sendLanguage(ctx: Context) {
     return ctx.reply(ctx.i18n.t('language'), languageKeyboard())
 }
 
-export async function setLanguage(ctx: Context) {
+async function setLanguage(ctx: Context) {
     let chat = ctx.dbchat
     if ('data' in ctx.callbackQuery) {
         chat.language = ctx.callbackQuery.data

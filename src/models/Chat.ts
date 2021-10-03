@@ -35,6 +35,8 @@ export class Chat {
     @prop()
     onetimepass?: string
 
+    // chat only
+
     @prop({ default: true })
     active: boolean
 }

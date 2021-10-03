@@ -15,17 +15,15 @@ import { attachChat } from '@/middlewares/attachChat'
 import { setupHelpHandlers } from '@/handlers/help'
 import { setupAuthHandlers } from './handlers/auth'
 import { setupUploadHandlers } from './handlers/upload'
-import { setLanguage, sendLanguage } from '@/handlers/language'
-
-// Actions
-import { localeActions } from './handlers/language'
+import { setupLanguageHandlers } from '@/handlers/language'
 
 // Other
 import { bot } from '@/helpers/bot'
 import { GoogleAuth } from '@/helpers/google/google'
 import { mongoConnect } from './models'
 import { log } from '@/helpers/log'
-;(async function main() {
+
+(async function main() {
     await mongoConnect()
 
     const auth = await GoogleAuth.build()
@@ -36,14 +34,11 @@ import { log } from '@/helpers/log'
     bot.use(i18n.middleware(), attachI18N)
     bot.use(getMongoSession())
 
-    // Commands
+    // Commands & actions
     await setupHelpHandlers(bot, auth)
-    bot.command('language', sendLanguage)
+    setupLanguageHandlers(bot)
     await setupAuthHandlers(bot, auth)
     setupUploadHandlers(bot, auth)
-
-    // Actions
-    bot.action(localeActions, setLanguage)
 
     // Errors
     bot.catch((err, ctx) => {

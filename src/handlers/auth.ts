@@ -53,7 +53,6 @@ export async function setupAuthHandlers(
             lang: ctx.dbchat.language,
         }
         await ctx.dbchat.updateOne({ onetimepass })
-	console.log(ctx.dbchat)
         return ctx.replyWithMarkdown(
             ctx.i18n
                 .t('google_signin_md')
