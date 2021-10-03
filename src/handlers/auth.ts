@@ -1,6 +1,6 @@
 import { IAuthorization } from '@/helpers/google/google'
 import { OAuthSubscribe } from '@/helpers/google/server'
-import { Chat } from '@/models'
+import { findChat } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import { log } from '@/helpers/log'
@@ -14,7 +14,7 @@ export async function setupAuthHandlers(
     auth: IAuthorization
 ) {
     await OAuthSubscribe(async (cid, onetimepass, code) => {
-        const dbchat = await Chat.find(cid)
+        const dbchat = await findChat(cid)
         if (
             !dbchat ||
             dbchat.onetimepass === undefined ||
@@ -53,7 +53,7 @@ export async function setupAuthHandlers(
             lang: ctx.dbchat.language,
         }
         await ctx.dbchat.updateOne({ onetimepass })
-
+	console.log(ctx.dbchat)
         return ctx.replyWithMarkdown(
             ctx.i18n
                 .t('google_signin_md')

@@ -23,11 +23,8 @@ class GoogleCredentials implements Auth.Credentials {
 }
 
 export class Chat {
-    
-    // data
-
     @prop({ required: true, index: true, unique: true })
-    public uid: number
+    public cid: number
 
     @prop({ required: true, default: 'en' })
     public language: string
@@ -39,30 +36,29 @@ export class Chat {
     onetimepass?: string
 
     @prop({ default: true })
-    on: boolean
+    active: boolean
+}
 
-    // actions
+// Get User model
+const ChatModel = getModelForClass(Chat, {
+    schemaOptions: { timestamps: true },
+})
 
-    private static Model = getModelForClass(Chat, {
-        schemaOptions: { timestamps: true },
-    })
-
-    public static async findOrCreate(id: number) {
-        let chat = await Chat.Model.findOne({ uid: id })
-        if (!chat) {
-            // Try/catch is used to avoid race conditions
-            try {
-                chat = await new Chat.Model({ uid: id }).save()
-            } catch (err) {
-                chat = await Chat.Model.findOne({ uid: id })
-            }
+// Get or create user
+export async function findOrCreateChat(id: number) {
+    let user = await ChatModel.findOne({ cid: id })
+    if (!user) {
+        // Try/catch is used to avoid race conditions
+        try {
+            user = await new ChatModel({ cid: id }).save()
+        } catch (err) {
+            user = await ChatModel.findOne({ cid: id })
         }
-        
-        return chat
     }
+    return user
+}
 
-    public static find(id: number) {
-        return Chat.Model.findOne({ uid: id })
-    }
+export async function findChat(id: number) {
+    return await ChatModel.findOne({ cid: id })
 }
 

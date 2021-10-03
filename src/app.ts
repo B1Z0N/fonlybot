@@ -9,7 +9,7 @@ dotenv.config({ path: `${process.cwd()}/.env` })
 import { ignoreOldMessageUpdates } from '@/middlewares/ignoreOldMessageUpdates'
 import { i18n, attachI18N } from '@/helpers/i18n'
 import { getMongoSession } from '@/middlewares/mongoSession'
-import { attachUser } from '@/middlewares/attachUser'
+import { attachChat } from '@/middlewares/attachChat'
 
 // Commands
 import { setupHelpHandlers } from '@/handlers/help'
@@ -32,7 +32,7 @@ import { log } from '@/helpers/log'
 
     // Middlewares
     bot.use(ignoreOldMessageUpdates)
-    bot.use(attachUser)
+    bot.use(attachChat)
     bot.use(i18n.middleware(), attachI18N)
     bot.use(getMongoSession())
 
@@ -47,7 +47,7 @@ import { log } from '@/helpers/log'
 
     // Errors
     bot.catch((err, ctx) => {
-        log.error(`[c=${ctx.dbchat.uid}] ${err}`)
+        log.error(`[c=${ctx.dbchat.cid}] ${err}`)
     })
 
     // Start

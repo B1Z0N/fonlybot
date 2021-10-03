@@ -71,7 +71,7 @@ export function setupUploadHandlers(
                 { reply_to_message_id: ctx.message.message_id }
             )
             log.error(
-                `[c=${ctx.dbchat.uid}] Error on uploading file to the drive: ${err}`
+                `[c=${ctx.dbchat.cid}] Error on uploading file to the drive: ${err}`
             )
         }
     })
