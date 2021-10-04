@@ -1,4 +1,3 @@
-import { chatAdminsOrSignedInComposer } from '@/helpers/chatAdmin'
 import { IAuthorization } from '@/helpers/google/google'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf, Composer } from 'telegraf'
@@ -24,18 +23,18 @@ export function setupUploadHandlers(
     ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
     bot.command('on', Composer.admin(async ctx => {
-        await ctx.dbchat.updateOne({ active: false })
-    }))
-
-    bot.command('off', Composer.admin(async ctx => {
         await ctx.dbchat.updateOne({ active: true })
     }))
 
+    bot.command('off', Composer.admin(async ctx => {
+        await ctx.dbchat.updateOne({ active: false })
+    }))
+
     bot.on('document', async ctx => {
-        if (ctx.dbchat.active) return
+        if (!ctx.dbchat.active) return
         if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
-        if (!ctx.dbchat.credentials) {
-            ctx.replyWithMarkdown(ctx.i18n.t('authorize_first_md'))
+        if (!ctx.dbchat.credentials && ctx.chat.type == 'private') {
+            ctx.replyWithMarkdown(ctx.t('authorize_first_md'))
             return
         }
 
@@ -46,7 +45,7 @@ export function setupUploadHandlers(
         } = ctx.message.document
 
         if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-            ctx.reply(ctx.i18n.t('upload_too_big').replace('{0}', fileName), {
+            ctx.reply(ctx.t('upload_too_big').replace('{0}', fileName), {
                 reply_to_message_id: ctx.message.message_id,
             })
             return
@@ -78,7 +77,7 @@ export function setupUploadHandlers(
             )
         } catch (err) {
             ctx.replyWithMarkdown(
-                ctx.i18n.t('upload_failure_md').replace('{0}', fileName),
+                ctx.t('upload_failure_md').replace('{0}', fileName),
                 { reply_to_message_id: ctx.message.message_id }
             )
             log.error(

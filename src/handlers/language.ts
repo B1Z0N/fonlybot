@@ -1,20 +1,24 @@
 import { Composer, Context, Markup as m, Telegraf } from 'telegraf'
 import { readdirSync, readFileSync } from 'fs'
 import { safeLoad } from 'js-yaml'
+import { adminOrPrivateComposer, isAdminOrPrivate } from '@/helpers/composers'
 
 export function setupLanguageHandlers(bot: Telegraf) {
-    bot.command('lang', Composer.admin(sendLanguage))
+    bot.command('language', adminOrPrivateComposer(sendLanguage))
     bot.action(localeActions, setLanguage)
 }
 
 const localeActions = localesFiles().map((file) => file.split('.')[0])
 
 function sendLanguage(ctx: Context) {
-    return ctx.reply(ctx.i18n.t('language'), languageKeyboard())
+    return ctx.reply(ctx.t('language'), languageKeyboard())
 }
 
 async function setLanguage(ctx: Context) {
     let chat = ctx.dbchat
+    if (!(await isAdminOrPrivate(ctx, ctx.callbackQuery.from.id))) {
+    	return ctx.answerCbQuery(ctx.t('admin_only'))
+    }
     if ('data' in ctx.callbackQuery) {
         chat.language = ctx.callbackQuery.data
         chat = await (chat as any).save()
@@ -27,7 +31,7 @@ async function setLanguage(ctx: Context) {
             message.chat.id,
             message.message_id,
             undefined,
-            ctx.i18n.t('language_selected_html'),
+            ctx.t('language_selected_html'),
             { parse_mode: 'HTML' }
         )
     }

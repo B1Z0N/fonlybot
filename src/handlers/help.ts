@@ -3,10 +3,10 @@ import { Context, Telegraf } from 'telegraf'
 
 export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
     const genHTMLMsg = async (ctx) => {
-        let msg = `${ctx.i18n.t('help_html')}\n`
+        let msg = `${ctx.t('help_html')}\n`
 
         if (!ctx.dbchat.credentials) {
-            msg += ctx.i18n.t('not_authorized_html')
+            msg += ctx.t('not_authorized_html')
         } else {
             const email = await auth.getEmail(ctx.dbchat.credentials)
             const folder = await auth.getFolder(
@@ -18,7 +18,7 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
             ctx.dbchat.credentials.folderId = folder.id
             ctx.dbchat = await ctx.dbchat.save()
 
-            msg += ctx.i18n
+            msg += ctx
                 .t('authorized_html')
                 .replace('{email}', email)
                 .replace('{folder}', folderLink)
@@ -32,7 +32,7 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
         const msg = await genHTMLMsg(ctx)
         const userMention = `<a href="tg://user?id=${ctx.from.id}">${ctx.from.first_name}</a>`
         await ctx.replyWithHTML(
-            ctx.i18n.t('hello_html').replace('{name}', userMention)
+            ctx.t('hello_html').replace('{name}', userMention)
         )
         await ctx.replyWithHTML(msg)
     })

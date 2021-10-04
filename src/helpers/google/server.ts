@@ -3,7 +3,7 @@ import * as url from 'url'
 import { promises as fs } from 'fs'
 import Fastify from 'fastify'
 import { log } from '@/helpers/log'
-
+import { ChatType } from '@/middlewares/attachChat'
 import { i18n } from '@/helpers/i18n'
 import * as Mustache from 'mustache'
 
@@ -11,7 +11,7 @@ export const TEMPLATE_FOLDER = `${process.cwd()}/static/templates`
 export const PORT = +process.env.CB_PORT
 
 export interface OAuthCallback {
-    (cid: number, onetimepass: string, code: string): Promise<number>
+    (cid: number, chat_type: ChatType, onetimepass: string, code: string): Promise<number>
 }
 
 interface ICallbackQuerystring {
@@ -42,8 +42,8 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
     // OAuth callback handler
     app.get<{ Querystring: ICallbackQuerystring }>('/cb', async (request, reply) => {
             const { code, state } = request.query
-            const { cid, onetimepass, lang } = JSON.parse(`${state}`)
-            const httpCode = await cb(cid, onetimepass, `${code}`)
+            const { cid, chat_type, onetimepass, lang } = JSON.parse(`${state}`)
+            const httpCode = await cb(cid, chat_type as ChatType, onetimepass, `${code}`)
 
             reply.type('text/html').code(httpCode)
 

@@ -42,7 +42,7 @@ import { log } from '@/helpers/log'
 
     // Errors
     bot.catch((err, ctx) => {
-        log.error(`[c=${ctx.dbchat.cid}] ${err}`)
+        log.error(`[c=${ctx.dbchat}] ${err}`)
     })
 
     // Start
