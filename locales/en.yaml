@@ -21,7 +21,7 @@ language: Please, select the language.
 language_selected_html: <b>Fonly</b> speaks English now ✅.
 
 google_signin_md_pr: Signin [here]({0}), so I could take care of everything else.
-google_signin_md_pub: Signin [here]({0})(onetime link), so I could take care of everything else.
+google_signin_md_pub: Signin [here]({0}), so I could take care of everything else.
 google_signout: Signed out of your google drive ✅.
 google_success_pr: Successfully signed in as {email} ✅. Try giving me some files.
 google_success_pub: Successfully signed in ✅. Try giving me some files.

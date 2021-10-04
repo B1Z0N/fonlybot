@@ -93,7 +93,11 @@ export class GoogleAuth implements IAuthorization {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
 
-        folder.id = (await this.getFolderByDrive(drive, folder)).id
+        // TODO
+        // should we check on every upload if folder exists?
+        // how to beat concurrency when every upload creates its own folder
+        // till one of them saves it to db
+        // folder.id = (await this.getFolderByDrive(drive, folder)).id
 
         const mimeType = Utils.mimeType(fileName)
         const fileRes = await drive.files.create({
@@ -116,12 +120,13 @@ export class GoogleAuth implements IAuthorization {
             },
         })
 
-        return {
+        const res = {
             id: fileRes.data.id,
             name: fileName,
             link: Utils.sharedFileLink(fileRes.data.id),
             parentId: folder.id,
         }
+        return res
     }
 
     private async getFolderByDrive(drive: drive_v3.Drive, folder: GDriveFile) {
@@ -151,7 +156,8 @@ export class GoogleAuth implements IAuthorization {
             : await createFolder()
         ).data
 
-        folder.link = Utils.sharedFolderLink(folder.id)
+        folder.link = Utils.sharedFolderLink(res.id)
+        folder.id = res.id
 
         return folder
     }

@@ -9,14 +9,12 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
             msg += ctx.t('not_authorized_html')
         } else {
             const email = await auth.getEmail(ctx.dbchat.credentials)
-            const folder = await auth.getFolder(ctx.dbchat.credentials, {
-                id: ctx.dbchat.credentials.folderId,
-                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
-            })
-            const folderLink = Utils.sharedFolderLink(folder.id)
-
-            ctx.dbchat.credentials.folderId = folder.id
-            ctx.dbchat = await ctx.dbchat.save()
+// see helpers/google/google:GoogleAuth:upload todo for details
+//            const folder = await auth.getFolder(ctx.dbchat.credentials, {
+//                id: ctx.dbchat.credentials.folderId,
+//                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
+//            })
+            const folderLink = Utils.sharedFolderLink(ctx.dbchat.credentials.folderId)
 
             msg += ctx
                 .t('authorized_html')

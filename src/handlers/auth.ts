@@ -12,7 +12,7 @@ export async function setupAuthHandlers(
     bot: Telegraf<MongoSessionContext>,
     auth: IAuthorization
 ) {
-    await OAuthSubscribe(async (cid, chat_type, onetimepass, code) => {
+    await OAuthSubscribe(async (cid, chat_type, chat_title, onetimepass, code) => {
         const dbchat = await findChat(cid)
         if (
             !dbchat ||
@@ -24,6 +24,7 @@ export async function setupAuthHandlers(
 
         try {
             dbchat.credentials = await auth.getToken(code)
+            dbchat.credentials.folderId = (await auth.getFolder(dbchat.credentials, { name: chat_title })).id
 
             const email = await auth.getEmail(dbchat.credentials)
             const msg = i18n
@@ -62,6 +63,7 @@ export async function setupAuthHandlers(
             const state = {
                 cid: ctx.message.chat.id,
                 chat_type: ctx.chat_type,
+                chat_title: 'title' in ctx.chat ? ctx.chat.title : '',
                 onetimepass,
                 lang: ctx.dbchat.language,
             }
