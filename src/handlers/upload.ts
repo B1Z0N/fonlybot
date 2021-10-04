@@ -4,6 +4,7 @@ import { Telegraf, Composer } from 'telegraf'
 import axios from 'axios'
 import { Readable } from 'stream'
 import { log } from '@/helpers/log'
+import { chat } from 'googleapis/build/src/apis/chat'
 
 const MAX_FILE_UPLOAD_SIZE = 20 * 1024 * 1024 // 20mb
 const IGNORED_MIME_TYPES = new Set([
@@ -16,21 +17,26 @@ const IGNORED_MIME_TYPES = new Set([
     'image/webp',
 ])
 
-
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
     auth: IAuthorization,
     ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
-    bot.command('on', Composer.admin(async ctx => {
-        await ctx.dbchat.updateOne({ active: true })
-    }))
+    bot.command(
+        'on',
+        Composer.admin(async (ctx) => {
+            await ctx.dbchat.updateOne({ active: true })
+        })
+    )
 
-    bot.command('off', Composer.admin(async ctx => {
-        await ctx.dbchat.updateOne({ active: false })
-    }))
+    bot.command(
+        'off',
+        Composer.admin(async (ctx) => {
+            await ctx.dbchat.updateOne({ active: false })
+        })
+    )
 
-    bot.on('document', async ctx => {
+    bot.on('document', async (ctx) => {
         if (!ctx.dbchat.active) return
         if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
         if (!ctx.dbchat.credentials && ctx.chat_type == 'pr') {
@@ -56,12 +62,17 @@ export function setupUploadHandlers(
             const response = await axios.get(tgFileUrl, {
                 responseType: 'stream',
             })
-            const { url: googleFileUrl, folderId } = await auth.upload(
-                ctx.dbchat.credentials,
-                response.data as Readable,
-                fileName,
-                ctx.dbchat.credentials.folderId
-            )
+
+            const { link: googleFileUrl, parentId: folderId } =
+                await auth.upload(
+                    ctx.dbchat.credentials,
+                    response.data as Readable,
+                    fileName,
+                    {
+                        id: ctx.dbchat.credentials.folderId,
+                        name: 'title' in ctx.chat ? ctx.chat.title : undefined,
+                    }
+                )
 
             ctx.dbchat.credentials.folderId = folderId
             ctx.dbchat = await ctx.dbchat.save()

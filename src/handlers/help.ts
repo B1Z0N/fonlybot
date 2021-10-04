@@ -1,5 +1,5 @@
 import { GoogleAuth, Utils } from '@/helpers/google/google'
-import { Context, Telegraf } from 'telegraf'
+import { Telegraf } from 'telegraf'
 
 export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
     const genHTMLMsg = async (ctx) => {
@@ -9,10 +9,10 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
             msg += ctx.t('not_authorized_html')
         } else {
             const email = await auth.getEmail(ctx.dbchat.credentials)
-            const folder = await auth.getFolder(
-                ctx.dbchat.credentials,
-                ctx.dbchat.credentials.folderId
-            )
+            const folder = await auth.getFolder(ctx.dbchat.credentials, {
+                id: ctx.dbchat.credentials.folderId,
+                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
+            })
             const folderLink = Utils.sharedFolderLink(folder.id)
 
             ctx.dbchat.credentials.folderId = folder.id
@@ -27,8 +27,8 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
         return msg
     }
 
-    bot.command('help', async ctx => ctx.replyWithHTML(await genHTMLMsg(ctx)))
-    bot.command('start', async ctx => {
+    bot.command('help', async (ctx) => ctx.replyWithHTML(await genHTMLMsg(ctx)))
+    bot.command('start', async (ctx) => {
         const msg = await genHTMLMsg(ctx)
         const userMention = `<a href="tg://user?id=${ctx.from.id}">${ctx.from.first_name}</a>`
         await ctx.replyWithHTML(

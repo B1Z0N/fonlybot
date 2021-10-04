@@ -33,18 +33,18 @@ export class Chat {
     public credentials?: GoogleCredentials
 
     @prop()
-    onetimepass?: string
+    public onetimepass?: string
 
     // chat only
 
     @prop({ default: true })
-    active: boolean
+    public active: boolean
 
     @prop({ type: Number })
-    to_delete_ids: number[]
+    public to_delete_ids: number[]
 
     @prop()
-    to_edit_id?: number
+    public to_edit_id?: number
 }
 
 // Get User model
@@ -69,4 +69,3 @@ export async function findOrCreateChat(id: number) {
 export async function findChat(id: number) {
     return await ChatModel.findOne({ cid: id })
 }
-

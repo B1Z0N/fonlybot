@@ -17,7 +17,7 @@ function sendLanguage(ctx: Context) {
 async function setLanguage(ctx: Context) {
     let chat = ctx.dbchat
     if (!(await isAdminOrPrivate(ctx, ctx.callbackQuery.from.id))) {
-    	return ctx.answerCbQuery(ctx.t('admin_only'))
+        return ctx.answerCbQuery(ctx.t('admin_only'))
     }
     if ('data' in ctx.callbackQuery) {
         chat.language = ctx.callbackQuery.data

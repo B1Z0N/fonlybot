@@ -11,12 +11,17 @@ export const TEMPLATE_FOLDER = `${process.cwd()}/static/templates`
 export const PORT = +process.env.CB_PORT
 
 export interface OAuthCallback {
-    (cid: number, chat_type: ChatType, onetimepass: string, code: string): Promise<number>
+    (
+        cid: number,
+        chat_type: ChatType,
+        onetimepass: string,
+        code: string
+    ): Promise<number>
 }
 
 interface ICallbackQuerystring {
-  code: string;
-  state: string;
+    code: string
+    state: string
 }
 
 export async function OAuthSubscribe(cb: OAuthCallback) {
@@ -28,7 +33,7 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
     const pp = `${await fs.readFile(`${TEMPLATE_FOLDER}/privacy_policy.html`)}`
 
     const app = Fastify({})
-    
+
     // landing
     app.get('/', (request, reply) => {
         reply.type('text/html').code(200).send(index)
@@ -40,10 +45,17 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
     })
 
     // OAuth callback handler
-    app.get<{ Querystring: ICallbackQuerystring }>('/cb', async (request, reply) => {
+    app.get<{ Querystring: ICallbackQuerystring }>(
+        '/cb',
+        async (request, reply) => {
             const { code, state } = request.query
             const { cid, chat_type, onetimepass, lang } = JSON.parse(`${state}`)
-            const httpCode = await cb(cid, chat_type as ChatType, onetimepass, `${code}`)
+            const httpCode = await cb(
+                cid,
+                chat_type as ChatType,
+                onetimepass,
+                `${code}`
+            )
 
             reply.type('text/html').code(httpCode)
 
@@ -63,8 +75,6 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
             }
         }
     )
-
-
 
     app.listen(PORT, (err, address) => {
         if (err) {

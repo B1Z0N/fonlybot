@@ -15,12 +15,12 @@ export function attachI18N(ctx: Context, next: () => void) {
     const anyI18N = ctx.i18n as any
     anyI18N.locale(ctx.dbchat.language)
     const negated_chat_type = negateChatType(ctx.chat_type)
-    ctx.t = tag => {
+    ctx.t = (tag) => {
         // neccessary evil for now
-        try { 
+        try {
             return ctx.i18n.t(`${tag}_${ctx.chat_type}`)
         } catch {
-            try { 
+            try {
                 return ctx.i18n.t(tag)
             } catch {
                 return ctx.i18n.t(`${tag}_${negated_chat_type}`)

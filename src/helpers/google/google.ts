@@ -11,20 +11,27 @@ const SCOPES = [
 const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 const FOLDER_NAME = 'fonly'
 
+export interface GDriveFile {
+    id?: string
+    name?: string
+    link?: string
+    parentId?: string
+}
+
 export interface IAuthorization {
     getAuthUrl: (state: any) => string
     getToken: (code: string) => Promise<Auth.Credentials>
     upload: (
         token: Auth.Credentials,
         data: Readable,
-        name: string,
-        folderId?: string
-    ) => Promise<IUploadInfo>
+        fileName: string,
+        folder: GDriveFile
+    ) => Promise<GDriveFile>
 
     getFolder: (
         token: Auth.Credentials,
-        folderId?: string
-    ) => Promise<drive_v3.Schema$File>
+        folder: GDriveFile
+    ) => Promise<GDriveFile>
 
     getEmail: (token: Auth.Credentials) => Promise<string>
 }
@@ -80,20 +87,20 @@ export class GoogleAuth implements IAuthorization {
     async upload(
         token: Auth.Credentials,
         data: Readable,
-        name: string,
-        folderId?: string
+        fileName: string,
+        folder: GDriveFile
     ) {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
 
-        folderId = (await this.getFolderByDrive(drive, folderId)).id
+        folder.id = (await this.getFolderByDrive(drive, folder)).id
 
-        const mimeType = Utils.mimeType(name)
+        const mimeType = Utils.mimeType(fileName)
         const fileRes = await drive.files.create({
             requestBody: {
-                name,
+                name: fileName,
                 mimeType,
-                parents: [folderId],
+                parents: [folder.id],
             },
             media: {
                 mimeType,
@@ -109,39 +116,50 @@ export class GoogleAuth implements IAuthorization {
             },
         })
 
-        return { url: Utils.sharedFileLink(fileRes.data.id), folderId }
+        return {
+            id: fileRes.data.id,
+            name: fileName,
+            link: Utils.sharedFileLink(fileRes.data.id),
+            parentId: folder.id,
+        }
     }
 
-    private async getFolderByDrive(drive: drive_v3.Drive, folderId: string) {
+    private async getFolderByDrive(drive: drive_v3.Drive, folder: GDriveFile) {
+        folder.name = folder.name ? `${FOLDER_NAME}/${folder.name}` : FOLDER_NAME 
+
         const createFolder = async () => {
             const folderRes = await drive.files.create({
                 requestBody: {
-                    name: FOLDER_NAME,
+                    name: folder.name,
                     mimeType: 'application/vnd.google-apps.folder',
                 },
             })
 
-	    	const permissionRes = await drive.permissions.create({
-        		fileId: folderRes.data.id,
-            	requestBody: {
-                	role: 'reader',
-                	type: 'anyone',
-            	},
+            const permissionRes = await drive.permissions.create({
+                fileId: folderRes.data.id,
+                requestBody: {
+                    role: 'reader',
+                    type: 'anyone',
+                },
             })
 
             return folderRes
-		}
+        }
 
-        return await (folderId
-            ? await drive.files.get({ fileId: folderId }).catch(createFolder)
+        const res = await (folder.id
+            ? await drive.files.get({ fileId: folder.id }).catch(createFolder)
             : await createFolder()
         ).data
+
+        folder.link = Utils.sharedFolderLink(folder.id)
+
+        return folder
     }
 
-    async getFolder(token: Auth.Credentials, folderId?: string) {
+    async getFolder(token: Auth.Credentials, folder: GDriveFile) {
         this.auth.setCredentials(token)
         const drive = google.drive({ version: 'v3', auth: this.auth })
-        return await this.getFolderByDrive(drive, folderId)
+        return await this.getFolderByDrive(drive, folder)
     }
 }
 

@@ -23,7 +23,7 @@ import { GoogleAuth } from '@/helpers/google/google'
 import { mongoConnect } from './models'
 import { log } from '@/helpers/log'
 
-(async function main() {
+;(async function main() {
     await mongoConnect()
 
     const auth = await GoogleAuth.build()

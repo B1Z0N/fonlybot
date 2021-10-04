@@ -12,5 +12,5 @@ export function adminOrPrivateComposer(fn: MiddlewareFn<Context>) {
 export async function isAdminOrPrivate(ctx: Context, uid: number) {
     if (ctx.chat.type == 'private') return true
     const admins = await ctx.getChatAdministrators()
-    return admins.find(a => a.user.id == uid) != undefined
+    return admins.find((a) => a.user.id == uid) != undefined
 }
