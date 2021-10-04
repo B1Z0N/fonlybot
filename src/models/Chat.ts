@@ -39,6 +39,12 @@ export class Chat {
 
     @prop({ default: true })
     active: boolean
+
+    @prop()
+    to_delete_ids: number[]
+
+    @prop()
+    to_edit_id?: number
 }
 
 // Get User model

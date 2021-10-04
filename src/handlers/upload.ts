@@ -33,9 +33,8 @@ export function setupUploadHandlers(
     bot.on('document', async ctx => {
         if (!ctx.dbchat.active) return
         if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
-        if (!ctx.dbchat.credentials && ctx.chat.type == 'private') {
-            ctx.replyWithMarkdown(ctx.t('authorize_first_md'))
-            return
+        if (!ctx.dbchat.credentials && ctx.chat_type == 'pr') {
+            return ctx.replyWithMarkdown(ctx.t('authorize_first_md'))
         }
 
         const {
@@ -45,10 +44,9 @@ export function setupUploadHandlers(
         } = ctx.message.document
 
         if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-            ctx.reply(ctx.t('upload_too_big').replace('{0}', fileName), {
+            return ctx.reply(ctx.t('upload_too_big').replace('{0}', fileName), {
                 reply_to_message_id: ctx.message.message_id,
             })
-            return
         }
 
         try {
@@ -68,7 +66,7 @@ export function setupUploadHandlers(
             ctx.dbchat.credentials.folderId = folderId
             ctx.dbchat = await ctx.dbchat.save()
 
-            ctx.replyWithMarkdown(
+            return ctx.replyWithMarkdown(
                 ctx.i18n
                     .t('upload_success_md')
                     .replace('{0}', fileName)
@@ -76,12 +74,12 @@ export function setupUploadHandlers(
                 { reply_to_message_id: ctx.message.message_id }
             )
         } catch (err) {
-            ctx.replyWithMarkdown(
-                ctx.t('upload_failure_md').replace('{0}', fileName),
-                { reply_to_message_id: ctx.message.message_id }
-            )
             log.error(
                 `[c=${ctx.dbchat.cid}] Error on uploading file to the drive: ${err}`
+            )
+            return ctx.replyWithMarkdown(
+                ctx.t('upload_failure_md').replace('{0}', fileName),
+                { reply_to_message_id: ctx.message.message_id }
             )
         }
     })

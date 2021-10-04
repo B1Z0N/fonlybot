@@ -27,13 +27,13 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
         return msg
     }
 
-    bot.command('help', async (ctx) => ctx.replyWithHTML(await genHTMLMsg(ctx)))
-    bot.command('start', async (ctx) => {
+    bot.command('help', async ctx => ctx.replyWithHTML(await genHTMLMsg(ctx)))
+    bot.command('start', async ctx => {
         const msg = await genHTMLMsg(ctx)
         const userMention = `<a href="tg://user?id=${ctx.from.id}">${ctx.from.first_name}</a>`
         await ctx.replyWithHTML(
             ctx.t('hello_html').replace('{name}', userMention)
         )
-        await ctx.replyWithHTML(msg)
+        return ctx.replyWithHTML(msg)
     })
 }
