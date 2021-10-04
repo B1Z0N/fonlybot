@@ -1,8 +1,12 @@
-import { GoogleAuth, Utils } from '@/helpers/google/google'
+import { GoogleAuth, Utils, CREDENTIALS_PATH } from '@/helpers/google/google'
 import { Telegraf } from 'telegraf'
+import { promises as fs } from 'fs'
 
-export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
+export async function setupHelpHandlers(bot: Telegraf) {
+    const credentials = await fs.readFile(CREDENTIALS_PATH)
+
     const genHTMLMsg = async (ctx) => {
+        const auth = GoogleAuth.build(credentials)
         let msg = `${ctx.t('help_html')}\n`
 
         if (!ctx.dbchat.credentials) {
@@ -15,7 +19,6 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
 //                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
 //            })
             const folderLink = Utils.sharedFolderLink(ctx.dbchat.credentials.folderId)
-
             msg += ctx
                 .t('authorized_html')
                 .replace('{email}', email)

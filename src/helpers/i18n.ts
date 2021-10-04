@@ -1,7 +1,7 @@
 import I18N from 'telegraf-i18n'
 import { Context } from 'telegraf'
 const dirtyI18N = require('telegraf-i18n')
-import { negateChatType } from '@/middlewares/attachChat'
+import { negateChatType } from '@/middlewares/dbchat'
 
 export const i18n = new dirtyI18N({
     directory: `${__dirname}/../../locales`,

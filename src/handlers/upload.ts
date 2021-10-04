@@ -19,7 +19,6 @@ const IGNORED_MIME_TYPES = new Set([
 
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
-    auth: IAuthorization,
     ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
     bot.command(
@@ -55,6 +54,10 @@ export function setupUploadHandlers(
             })
         }
 
+        const initiatedMsg = await ctx.reply(ctx.t('upload_initiated'), {
+                reply_to_message_id: ctx.message.message_id,
+            })
+
         try {
             const tgFileUrl = (
                 await ctx.telegram.getFileLink(fileId)
@@ -64,7 +67,7 @@ export function setupUploadHandlers(
             })
 
             const { link: googleFileUrl, parentId: folderId } =
-                await auth.upload(
+                await ctx.auth.upload(
                     ctx.dbchat.credentials,
                     response.data as Readable,
                     fileName,
@@ -77,20 +80,25 @@ export function setupUploadHandlers(
             ctx.dbchat.credentials.folderId = folderId
             ctx.dbchat = await ctx.dbchat.save()
 
-            return ctx.replyWithMarkdown(
-                ctx.i18n
-                    .t('upload_success_md')
+            return ctx.telegram.editMessageText(
+                initiatedMsg.chat.id,
+                initiatedMsg.message_id,
+                undefined,
+                ctx.t('upload_success_md')
                     .replace('{0}', fileName)
                     .replace('{1}', googleFileUrl),
-                { reply_to_message_id: ctx.message.message_id }
+                { parse_mode: 'Markdown', disable_web_page_preview: true }
             )
         } catch (err) {
             log.error(
                 `[c=${ctx.dbchat.cid}] Error on uploading file to the drive: ${err}`
             )
-            return ctx.replyWithMarkdown(
+            return ctx.telegram.editMessageText(
+                initiatedMsg.chat.id,
+                initiatedMsg.message_id,
+                undefined,
                 ctx.t('upload_failure_md').replace('{0}', fileName),
-                { reply_to_message_id: ctx.message.message_id }
+                { parse_mode: 'Markdown' }
             )
         }
     })

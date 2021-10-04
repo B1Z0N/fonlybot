@@ -3,7 +3,7 @@ import * as url from 'url'
 import { promises as fs } from 'fs'
 import Fastify from 'fastify'
 import { log } from '@/helpers/log'
-import { ChatType } from '@/middlewares/attachChat'
+import { ChatType } from '@/middlewares/dbchat'
 import { i18n } from '@/helpers/i18n'
 import * as Mustache from 'mustache'
 
