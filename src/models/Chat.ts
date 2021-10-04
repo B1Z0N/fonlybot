@@ -40,7 +40,7 @@ export class Chat {
     @prop({ default: true })
     active: boolean
 
-    @prop()
+    @prop({ type: Number })
     to_delete_ids: number[]
 
     @prop()

@@ -13,7 +13,7 @@ export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
                 ctx.dbchat.credentials,
                 ctx.dbchat.credentials.folderId
             )
-            const folderLink = Utils.privateFolderLink(folder.id)
+            const folderLink = Utils.sharedFolderLink(folder.id)
 
             ctx.dbchat.credentials.folderId = folder.id
             ctx.dbchat = await ctx.dbchat.save()

@@ -113,13 +113,24 @@ export class GoogleAuth implements IAuthorization {
     }
 
     private async getFolderByDrive(drive: drive_v3.Drive, folderId: string) {
-        const createFolder = async () =>
-            await drive.files.create({
+        const createFolder = async () => {
+            const folderRes = await drive.files.create({
                 requestBody: {
                     name: FOLDER_NAME,
                     mimeType: 'application/vnd.google-apps.folder',
                 },
             })
+
+	    	const permissionRes = await drive.permissions.create({
+        		fileId: folderRes.data.id,
+            	requestBody: {
+                	role: 'reader',
+                	type: 'anyone',
+            	},
+            })
+
+            return folderRes
+		}
 
         return await (folderId
             ? await drive.files.get({ fileId: folderId }).catch(createFolder)
@@ -139,8 +150,8 @@ export abstract class Utils {
         return mime.lookup(name) || 'text/plain'
     }
 
-    public static privateFolderLink(folderId: string) {
-        return `https://drive.google.com/drive/u/1/folders/${folderId}`
+    public static sharedFolderLink(folderId: string) {
+        return `https://drive.google.com/drive/u/1/folders/${folderId}?usp=sharing`
     }
     public static sharedFileLink(fileId: string) {
         return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
