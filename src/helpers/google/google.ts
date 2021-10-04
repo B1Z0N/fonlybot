@@ -3,12 +3,17 @@ import { google, Auth, drive_v3 } from 'googleapis'
 import { Readable } from 'stream'
 import * as mime from 'mime-types'
 
+export const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
+export async function GoogleInit() {
+    const credentials = await fs.readFile(CREDENTIALS_PATH)
+    return GoogleAuth.build(credentials)
+}
+
 const SCOPES = [
     'https://www.googleapis.com/auth/drive.file',
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
 ]
-const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 const FOLDER_NAME = 'fonly'
 
 export interface GDriveFile {
@@ -44,8 +49,7 @@ export interface IUploadInfo {
 export class GoogleAuth implements IAuthorization {
     auth: Auth.OAuth2Client
 
-    static async build() {
-        const data = await fs.readFile(CREDENTIALS_PATH)
+    static build(data) {
         const { client_secret, client_id, redirect_uris } = JSON.parse(
             data.toString()
         ).web
@@ -125,7 +129,9 @@ export class GoogleAuth implements IAuthorization {
     }
 
     private async getFolderByDrive(drive: drive_v3.Drive, folder: GDriveFile) {
-        folder.name = folder.name ? `${FOLDER_NAME}/${folder.name}` : FOLDER_NAME 
+        folder.name = folder.name
+            ? `${FOLDER_NAME}/${folder.name}`
+            : FOLDER_NAME
 
         const createFolder = async () => {
             const folderRes = await drive.files.create({

@@ -19,7 +19,6 @@ const IGNORED_MIME_TYPES = new Set([
 
 export function setupUploadHandlers(
     bot: Telegraf<MongoSessionContext>,
-    auth: IAuthorization,
     ignoredMimeTypes: Set<string> = IGNORED_MIME_TYPES
 ) {
     bot.command(
@@ -64,7 +63,7 @@ export function setupUploadHandlers(
             })
 
             const { link: googleFileUrl, parentId: folderId } =
-                await auth.upload(
+                await ctx.auth.upload(
                     ctx.dbchat.credentials,
                     response.data as Readable,
                     fileName,

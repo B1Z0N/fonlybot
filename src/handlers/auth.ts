@@ -7,12 +7,16 @@ import { log } from '@/helpers/log'
 import { i18n } from '@/helpers/i18n'
 import { randomBytes } from 'crypto'
 import { adminOrPrivateComposer } from '@/helpers/composers'
+import { GoogleInit } from '@/helpers/google/google'
+import { GoogleAuth, CREDENTIALS_PATH } from '@/helpers/google/google'
+import { promises as fs } from 'fs'
 
-export async function setupAuthHandlers(
-    bot: Telegraf<MongoSessionContext>,
-    auth: IAuthorization
-) {
+export async function setupAuthHandlers(bot: Telegraf<MongoSessionContext>) {
+    const credentials = await fs.readFile(CREDENTIALS_PATH)
+
     await OAuthSubscribe(async (cid, chat_type, onetimepass, code) => {
+        const auth = GoogleAuth.build(credentials)
+
         const dbchat = await findChat(cid)
         if (
             !dbchat ||
@@ -70,7 +74,10 @@ export async function setupAuthHandlers(
                 await ctx.replyWithMarkdown(
                     ctx
                         .t('google_signin_md')
-                        .replace('{0}', auth.getAuthUrl(JSON.stringify(state)))
+                        .replace(
+                            '{0}',
+                            ctx.auth.getAuthUrl(JSON.stringify(state))
+                        )
                 )
             ).message_id
 

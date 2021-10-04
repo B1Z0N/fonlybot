@@ -1,15 +1,15 @@
 import { GoogleAuth, Utils } from '@/helpers/google/google'
 import { Telegraf } from 'telegraf'
 
-export function setupHelpHandlers(bot: Telegraf, auth: GoogleAuth) {
+export function setupHelpHandlers(bot: Telegraf) {
     const genHTMLMsg = async (ctx) => {
         let msg = `${ctx.t('help_html')}\n`
 
         if (!ctx.dbchat.credentials) {
             msg += ctx.t('not_authorized_html')
         } else {
-            const email = await auth.getEmail(ctx.dbchat.credentials)
-            const folder = await auth.getFolder(ctx.dbchat.credentials, {
+            const email = await ctx.auth.getEmail(ctx.dbchat.credentials)
+            const folder = await ctx.auth.getFolder(ctx.dbchat.credentials, {
                 id: ctx.dbchat.credentials.folderId,
                 name: 'title' in ctx.chat ? ctx.chat.title : undefined,
             })
