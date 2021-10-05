@@ -19,11 +19,12 @@ Also, please, consider looking at `.env.sample`.
 
 # TODO
 
+-   Fix refresh token error
+-   [Add](https://telegra.ph/So-your-bot-is-rate-limited-01-26) rate limits and queues to fix `429 Telegram error`
 -   Switch to os.path.join
 -   App verification by google(in progress)
 -   Switch to grammy-i18n
 -   Refactor auth closure code
--   [Add](https://telegra.ph/So-your-bot-is-rate-limited-01-26) rate limits and queues to fix `429 Telegram error`
 
 # License
 
