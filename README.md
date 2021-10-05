@@ -19,13 +19,11 @@ Also, please, consider looking at `.env.sample`.
 
 # TODO
 
--   Allow adding to groups.
-    -   Turn someone into default google driver
-    -   Create subfolders inside fonly folder for personal and chat docs
 -   Switch to os.path.join
 -   App verification by google(in progress)
--   Add admin commands
--   Add more languages to i18n
+-   Switch to grammy-i18n
+-   Refactor auth closure code
+-   [Add](https://telegra.ph/So-your-bot-is-rate-limited-01-26) rate limits and queues to fix `429 Telegram error`
 
 # License
 
