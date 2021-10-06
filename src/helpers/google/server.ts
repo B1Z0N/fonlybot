@@ -50,7 +50,8 @@ export async function OAuthSubscribe(cb: OAuthCallback) {
         '/cb',
         async (request, reply) => {
             const { code, state } = request.query
-            const { cid, chat_type, chat_title, onetimepass, lang } = JSON.parse(`${state}`)
+            const { cid, chat_type, chat_title, onetimepass, lang } =
+                JSON.parse(`${state}`)
             const httpCode = await cb(
                 cid,
                 chat_type as ChatType,

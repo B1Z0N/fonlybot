@@ -55,8 +55,8 @@ export function setupUploadHandlers(
         }
 
         const initiatedMsg = await ctx.reply(ctx.t('upload_initiated'), {
-                reply_to_message_id: ctx.message.message_id,
-            })
+            reply_to_message_id: ctx.message.message_id,
+        })
 
         try {
             const tgFileUrl = (
@@ -84,7 +84,8 @@ export function setupUploadHandlers(
                 initiatedMsg.chat.id,
                 initiatedMsg.message_id,
                 undefined,
-                ctx.t('upload_success_md')
+                ctx
+                    .t('upload_success_md')
                     .replace('{0}', fileName)
                     .replace('{1}', googleFileUrl),
                 { parse_mode: 'Markdown', disable_web_page_preview: true }

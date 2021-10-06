@@ -7,54 +7,59 @@ import { log } from '@/helpers/log'
 import { i18n } from '@/helpers/i18n'
 import { randomBytes } from 'crypto'
 import { adminOrPrivateComposer } from '@/helpers/composers'
-import { GoogleInit } from '@/helpers/google/google'
-import { GoogleAuth, CREDENTIALS_PATH } from '@/helpers/google/google'
 import { promises as fs } from 'fs'
 
-export async function setupAuthHandlers(bot: Telegraf<MongoSessionContext>) {
-    const credentials = await fs.readFile(CREDENTIALS_PATH)
-
-    await OAuthSubscribe(async (cid, chat_type, chat_title, onetimepass, code) => {
-        const auth = GoogleAuth.build(credentials)
-
-        const dbchat = await findChat(cid)
-        if (
-            !dbchat ||
-            dbchat.onetimepass === undefined ||
-            dbchat.onetimepass !== onetimepass
-        )
-            return 403
-        dbchat.onetimepass = undefined
-
-        try {
-            dbchat.credentials = await auth.getToken(code)
-            dbchat.credentials.folderId = (await auth.getFolder(dbchat.credentials, { name: chat_title })).id
-
-            const email = await auth.getEmail(dbchat.credentials)
-            const msg = i18n
-                .t(dbchat.language, 'google_success_' + chat_type)
-                .replace('{email}', email)
-            await bot.telegram.editMessageText(
-                cid,
-                dbchat.to_edit_id,
-                undefined,
-                msg
+export async function setupAuthHandlers(
+    bot: Telegraf<MongoSessionContext>,
+    auth: IAuthorization
+) {
+    await OAuthSubscribe(
+        async (cid, chat_type, chat_title, onetimepass, code) => {
+            const dbchat = await findChat(cid)
+            if (
+                !dbchat ||
+                dbchat.onetimepass === undefined ||
+                dbchat.onetimepass !== onetimepass
             )
-        } catch (err) {
-            await bot.telegram.editMessageText(
-                cid,
-                dbchat.to_edit_id,
-                undefined,
-                i18n.t(dbchat.language, 'google_failure')
-            )
-            log.error(`[c=${cid}] Error on getting google auth code: ${err}.`)
-            return 500
-        } finally {
-            dbchat.to_edit_id = undefined
-            await dbchat.save()
+                return 403
+            dbchat.onetimepass = undefined
+
+            try {
+                dbchat.credentials = await auth.getToken(code)
+                dbchat.credentials.folderId = (
+                    await auth.getFolder(dbchat.credentials, {
+                        name: chat_title,
+                    })
+                ).id
+
+                const email = await auth.getEmail(dbchat.credentials)
+                const msg = i18n
+                    .t(dbchat.language, 'google_success_' + chat_type)
+                    .replace('{email}', email)
+                await bot.telegram.editMessageText(
+                    cid,
+                    dbchat.to_edit_id,
+                    undefined,
+                    msg
+                )
+            } catch (err) {
+                await bot.telegram.editMessageText(
+                    cid,
+                    dbchat.to_edit_id,
+                    undefined,
+                    i18n.t(dbchat.language, 'google_failure')
+                )
+                log.error(
+                    `[c=${cid}] Error on getting google auth code: ${err}.`
+                )
+                return 500
+            } finally {
+                dbchat.to_edit_id = undefined
+                await dbchat.save()
+            }
+            return 200
         }
-        return 200
-    })
+    )
 
     bot.command(
         'google',
@@ -76,10 +81,7 @@ export async function setupAuthHandlers(bot: Telegraf<MongoSessionContext>) {
                 await ctx.replyWithMarkdown(
                     ctx
                         .t('google_signin_md')
-                        .replace(
-                            '{0}',
-                            ctx.auth.getAuthUrl(JSON.stringify(state))
-                        )
+                        .replace('{0}', auth.getAuthUrl(JSON.stringify(state)))
                 )
             ).message_id
 

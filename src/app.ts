@@ -10,7 +10,6 @@ import { ignoreOldMessageUpdates } from '@/middlewares/ignoreOldMessageUpdates'
 import { i18n, attachI18N } from '@/helpers/i18n'
 import { getMongoSession } from '@/middlewares/mongoSession'
 import { attachChat } from '@/middlewares/dbchat'
-import { setupAuthMiddleware } from './middlewares/auth'
 
 // Commands
 import { setupHelpHandlers } from '@/handlers/help'
@@ -20,10 +19,11 @@ import { setupLanguageHandlers } from '@/handlers/language'
 
 // Other
 import { bot } from '@/helpers/bot'
-import { GoogleAuth } from '@/helpers/google/google'
+import { IAuthorization, GoogleInit } from '@/helpers/google/google'
 import { mongoConnect } from './models'
 import { log } from '@/helpers/log'
 ;(async function main() {
+    const auth = await GoogleInit()
     await mongoConnect()
 
     // Middlewares
@@ -31,12 +31,11 @@ import { log } from '@/helpers/log'
     bot.use(attachChat)
     bot.use(i18n.middleware(), attachI18N)
     bot.use(getMongoSession())
-    await setupAuthMiddleware(bot)
 
     // Commands & actions
-    await setupHelpHandlers(bot)
+    await setupHelpHandlers(bot, auth)
     setupLanguageHandlers(bot)
-    await setupAuthHandlers(bot)
+    await setupAuthHandlers(bot, auth)
     setupUploadHandlers(bot)
 
     // Errors

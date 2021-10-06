@@ -1,24 +1,22 @@
-import { GoogleAuth, Utils, CREDENTIALS_PATH } from '@/helpers/google/google'
+import { Utils, IAuthorization } from '@/helpers/google/google'
 import { Telegraf } from 'telegraf'
-import { promises as fs } from 'fs'
 
-export async function setupHelpHandlers(bot: Telegraf) {
-    const credentials = await fs.readFile(CREDENTIALS_PATH)
-
+export async function setupHelpHandlers(bot: Telegraf, auth: IAuthorization) {
     const genHTMLMsg = async (ctx) => {
-        const auth = GoogleAuth.build(credentials)
         let msg = `${ctx.t('help_html')}\n`
 
         if (!ctx.dbchat.credentials) {
             msg += ctx.t('not_authorized_html')
         } else {
             const email = await auth.getEmail(ctx.dbchat.credentials)
-// see helpers/google/google:GoogleAuth:upload todo for details
-//            const folder = await auth.getFolder(ctx.dbchat.credentials, {
-//                id: ctx.dbchat.credentials.folderId,
-//                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
-//            })
-            const folderLink = Utils.sharedFolderLink(ctx.dbchat.credentials.folderId)
+            // see helpers/google/google:GoogleAuth:upload todo for details
+            //            const folder = await auth.getFolder(ctx.dbchat.credentials, {
+            //                id: ctx.dbchat.credentials.folderId,
+            //                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
+            //            })
+            const folderLink = Utils.sharedFolderLink(
+                ctx.dbchat.credentials.folderId
+            )
             msg += ctx
                 .t('authorized_html')
                 .replace('{email}', email)

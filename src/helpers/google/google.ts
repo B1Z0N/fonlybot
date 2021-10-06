@@ -3,7 +3,7 @@ import { google, Auth, drive_v3 } from 'googleapis'
 import { Readable } from 'stream'
 import * as mime from 'mime-types'
 
-export const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
+const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
 export async function GoogleInit() {
     const credentials = await fs.readFile(CREDENTIALS_PATH)
     return GoogleAuth.build(credentials)
@@ -46,7 +46,7 @@ export interface IUploadInfo {
     folderId?: string
 }
 
-export class GoogleAuth implements IAuthorization {
+class GoogleAuth implements IAuthorization {
     auth: Auth.OAuth2Client
 
     static build(data) {
