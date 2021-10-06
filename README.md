@@ -20,6 +20,7 @@ Also, please, consider looking at `.env.sample`.
 # TODO
 
 -   Fix refresh token error
+-   Add person who added boot to admins(in current bot's sense)
 -   [Add](https://telegra.ph/So-your-bot-is-rate-limited-01-26) rate limits and queues to fix `429 Telegram error`
 -   Switch to os.path.join
 -   App verification by google(in progress)
