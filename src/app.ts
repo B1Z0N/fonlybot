@@ -36,7 +36,7 @@ import { log } from '@/helpers/log'
     await setupHelpHandlers(bot, auth)
     setupLanguageHandlers(bot)
     await setupAuthHandlers(bot, auth)
-    setupUploadHandlers(bot)
+    setupUploadHandlers(bot, auth)
 
     // Errors
     bot.catch((err, ctx) => {

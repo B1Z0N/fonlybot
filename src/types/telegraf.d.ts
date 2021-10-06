@@ -8,7 +8,6 @@ declare module 'telegraf' {
     export class Context {
         dbchat: DocumentType<Chat>
         chat_type: ChatType
-        auth: GoogleAuth
         i18n: I18N
         t: (tag: string) => string
     }
