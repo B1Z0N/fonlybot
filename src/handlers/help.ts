@@ -1,23 +1,23 @@
 import { Utils, IAuthorization } from '@/helpers/google/google'
 import { Telegraf } from 'telegraf'
+import { findGoogleData } from '@/models/Google'
 
 export async function setupHelpHandlers(bot: Telegraf, auth: IAuthorization) {
   const genHTMLMsg = async (ctx) => {
     let msg = `${ctx.t('help_html')}\n`
 
-    if (!ctx.dbchat.credentials) {
+    if (!ctx.dbchat.email) {
       msg += ctx.t('not_authorized_html')
     } else {
-      const email = await auth.getEmail(ctx.dbchat.credentials)
       // see helpers/google/google:GoogleAuth:upload todo for details
       //            const folder = await auth.getFolder(ctx.dbchat.credentials, {
       //                id: ctx.dbchat.credentials.folderId,
       //                name: 'title' in ctx.chat ? ctx.chat.title : undefined,
       //            })
-      const folderLink = Utils.sharedFolderLink(ctx.dbchat.credentials.folderId)
+      const folderLink = Utils.sharedFolderLink(ctx.dbchat.folderId)
       msg += ctx
         .t('authorized_html')
-        .replace('{email}', email)
+        .replace('{email}', ctx.dbchat.email)
         .replace('{folder}', folderLink)
     }
 

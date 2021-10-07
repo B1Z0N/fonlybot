@@ -6,19 +6,16 @@ export class GoogleData implements Auth.Credentials {
   public access_token?: string
 
   @prop()
-  public refresh_token?: string
+  public refresh_token: string
 
-  @prop()
-  public scope?: string
+  // @prop()
+  // public scope?: string
 
-  @prop()
-  public token_type?: string
+  // @prop()
+  // public token_type?: string
 
-  @prop()
-  public expiry_date?: number
-
-  @prop()
-  public folderId?: string
+  // @prop()
+  // public expiry_date?: number
 
   @prop({ required: true, index: true, unique: true })
   public email: string
@@ -30,7 +27,6 @@ const GoogleCredentialsModel = getModelForClass(GoogleData, {
 
 export async function findOrCreateGoogleData(
   email: string,
-  folderId: string,
   creds: Auth.Credentials
 ) {
   let found = await GoogleCredentialsModel.findOne({ email })
@@ -43,8 +39,9 @@ export async function findOrCreateGoogleData(
     }
   }
 
-  found.folderId = folderId
-  await found.updateOne(creds)
+  found.access_token ||= creds.access_token
+  found.refresh_token ||= creds.refresh_token
+  await found.save()
 
   return found
 }
@@ -52,3 +49,4 @@ export async function findOrCreateGoogleData(
 export async function findGoogleData(email: string) {
   return await GoogleCredentialsModel.findOne({ email })
 }
+

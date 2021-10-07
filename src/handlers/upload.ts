@@ -72,7 +72,7 @@ export function setupUploadHandlers(
         response.data as Readable,
         fileName,
         {
-          id: credentials.folderId,
+          id: ctx.dbchat.folderId,
           name: 'title' in ctx.chat ? ctx.chat.title : undefined,
         }
       )

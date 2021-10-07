@@ -29,6 +29,9 @@ export class Chat {
   // as admins of the chat
   @prop()
   public adminid: number
+
+  @prop()
+  public folderId: string
 }
 
 // Get User model
