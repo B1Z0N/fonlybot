@@ -1,5 +1,5 @@
 import { prop, getModelForClass, Ref } from '@typegoose/typegoose'
-import { GoogleCredentials } from '@/models/GoogleCredentials'
+import { GoogleData } from '@/models/Google'
 
 export class Chat {
   @prop({ required: true, index: true, unique: true })
@@ -9,7 +9,7 @@ export class Chat {
   public language: string
 
   @prop()
-  public access_token?: string
+  public email?: string
 
   @prop()
   public onetimepass?: string

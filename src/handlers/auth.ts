@@ -7,7 +7,7 @@ import { log } from '@/helpers/log'
 import { i18n } from '@/helpers/i18n'
 import { randomBytes } from 'crypto'
 import { adminOrPrivateComposer } from '@/helpers/composers'
-import { findOrCreateGoogleCredentials } from '@/models/GoogleCredentials'
+import { findOrCreateGoogleData } from '@/models/Google'
 
 export async function setupAuthHandlers(
   bot: Telegraf<MongoSessionContext>,
@@ -25,16 +25,16 @@ export async function setupAuthHandlers(
       dbchat.onetimepass = undefined
 
       try {
-        const credentials = await findOrCreateGoogleCredentials(
-          await auth.getToken(code)
+        const tokens = await auth.getToken(code)
+        const email = await auth.getEmail(tokens)
+        const folder = await auth.getFolder(tokens, { name: chat_title })
+        const credentials = await findOrCreateGoogleData(
+          email,
+          folder.id,
+          tokens
         )
-        credentials.folderId = (
-          await auth.getFolder(credentials, { name: chat_title })
-        ).id
-        await credentials.save()
-        dbchat.access_token = credentials.access_token
+        dbchat.email = credentials.email
 
-        const email = await auth.getEmail(credentials)
         const msg = i18n
           .t(dbchat.language, 'google_success_' + chat_type)
           .replace('{email}', email)
@@ -92,7 +92,7 @@ export async function setupAuthHandlers(
   bot.command(
     'signout',
     adminOrPrivateComposer(async (ctx) => {
-      ctx.dbchat.access_token = undefined
+      ctx.dbchat.email = undefined
       await ctx.dbchat.save()
 
       return ctx.replyWithMarkdown(ctx.t('google_signout'))

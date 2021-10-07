@@ -5,7 +5,7 @@ import axios from 'axios'
 import { Readable } from 'stream'
 import { log } from '@/helpers/log'
 import { chat } from 'googleapis/build/src/apis/chat'
-import { findGoogleCredentials } from '@/models/GoogleCredentials'
+import { findGoogleData } from '@/models/Google'
 
 const MAX_FILE_UPLOAD_SIZE = 20 * 1024 * 1024 // 20mb
 const IGNORED_MIME_TYPES = new Set([
@@ -40,7 +40,7 @@ export function setupUploadHandlers(
   bot.on('document', async (ctx) => {
     if (!ctx.dbchat.active) return
     if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
-    if (!ctx.dbchat.access_token && ctx.chat_type == 'pr') {
+    if (!ctx.dbchat.email && ctx.chat_type == 'pr') {
       return ctx.replyWithMarkdown(ctx.t('authorize_first_md'))
     }
 
@@ -66,9 +66,7 @@ export function setupUploadHandlers(
         responseType: 'stream',
       })
 
-      const credentials = await findGoogleCredentials({
-        access_token: ctx.dbchat.access_token,
-      })
+      const credentials = await findGoogleData(ctx.dbchat.email)
       const { link: googleFileUrl, parentId: folderId } = await auth.upload(
         credentials,
         response.data as Readable,
