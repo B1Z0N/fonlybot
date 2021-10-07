@@ -5,10 +5,10 @@ import { DocumentType } from '@typegoose/typegoose'
 import { GoogleAuth } from '@/helpers/google/google'
 
 declare module 'telegraf' {
-    export class Context {
-        dbchat: DocumentType<Chat>
-        chat_type: ChatType
-        i18n: I18N
-        t: (tag: string) => string
-    }
+  export class Context {
+    dbchat: DocumentType<Chat>
+    chat_type: ChatType
+    i18n: I18N
+    t: (tag: string) => string
+  }
 }

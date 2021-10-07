@@ -24,28 +24,28 @@ import { IAuthorization, GoogleInit } from '@/helpers/google/google'
 import { mongoConnect } from '@/models'
 import { log } from '@/helpers/log'
 ;(async function main() {
-    const auth = await GoogleInit()
-    await mongoConnect()
+  const auth = await GoogleInit()
+  await mongoConnect()
 
-    // Middlewares
-    bot.use(ignoreOldMessageUpdates)
-    bot.use(attachChat)
-    bot.use(i18n.middleware(), attachI18N)
-    bot.use(getMongoSession())
+  // Middlewares
+  bot.use(ignoreOldMessageUpdates)
+  bot.use(attachChat)
+  bot.use(i18n.middleware(), attachI18N)
+  bot.use(getMongoSession())
 
-    // Commands & actions
-    await setupHelpHandlers(bot, auth)
-    setupLanguageHandlers(bot)
-    await setupAuthHandlers(bot, auth)
-    setupUploadHandlers(bot, auth)
-    setupChatHandlers(bot)
+  // Commands & actions
+  await setupHelpHandlers(bot, auth)
+  setupLanguageHandlers(bot)
+  await setupAuthHandlers(bot, auth)
+  setupUploadHandlers(bot, auth)
+  setupChatHandlers(bot)
 
-    // Errors
-    bot.catch((err, ctx) => {
-        log.error(`[c=${ctx.dbchat.id}] ${err}`)
-    })
+  // Errors
+  bot.catch((err, ctx) => {
+    log.error(`[c=${ctx.dbchat.id}] ${err}`)
+  })
 
-    // Start
-    await bot.launch()
-    log.info(`Bot ${bot.botInfo.username} is up and running`)
+  // Start
+  await bot.launch()
+  log.info(`Bot ${bot.botInfo.username} is up and running`)
 })()

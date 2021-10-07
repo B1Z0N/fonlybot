@@ -1,76 +1,55 @@
-import { prop, getModelForClass } from '@typegoose/typegoose'
-import { Auth } from 'googleapis'
-
-// TODO: maybe we could generate this?
-class GoogleCredentials implements Auth.Credentials {
-    @prop()
-    public access_token?: string
-
-    @prop()
-    public refresh_token?: string
-
-    @prop()
-    public scope?: string
-
-    @prop()
-    public token_type?: string
-
-    @prop()
-    public expiry_date?: number
-
-    @prop()
-    public folderId?: string
-}
+import { prop, getModelForClass, Ref } from '@typegoose/typegoose'
+import { GoogleCredentials } from '@/models/GoogleCredentials'
 
 export class Chat {
-    @prop({ required: true, index: true, unique: true })
-    public cid: number
+  @prop({ required: true, index: true, unique: true })
+  public cid: number
 
-    @prop({ required: true, default: 'en' })
-    public language: string
+  @prop({ required: true, default: 'en' })
+  public language: string
 
-    @prop()
-    public credentials?: GoogleCredentials
+  @prop()
+  public access_token?: string
 
-    @prop()
-    public onetimepass?: string
+  @prop()
+  public onetimepass?: string
 
-    // chat only
+  // chat only
 
-    @prop({ default: true })
-    public active: boolean
+  @prop({ default: true })
+  public active: boolean
 
-    @prop({ type: Number })
-    public to_delete_ids: number[]
+  @prop({ type: Number })
+  public to_delete_ids: number[]
 
-    @prop()
-    public to_edit_id?: number
+  @prop()
+  public to_edit_id?: number
 
-    // a user that added the bot to the chat has the same permissions
-    // as admins of the chat
-    @prop()
-    public adminid: number
+  // a user that added the bot to the chat has the same permissions
+  // as admins of the chat
+  @prop()
+  public adminid: number
 }
 
 // Get User model
 const ChatModel = getModelForClass(Chat, {
-    schemaOptions: { timestamps: true },
+  schemaOptions: { timestamps: true },
 })
 
 // Get or create user
 export async function findOrCreateChat(id: number) {
-    let user = await ChatModel.findOne({ cid: id })
-    if (!user) {
-        // Try/catch is used to avoid race conditions
-        try {
-            user = await new ChatModel({ cid: id }).save()
-        } catch (err) {
-            user = await ChatModel.findOne({ cid: id })
-        }
+  let found = await ChatModel.findOne({ cid: id })
+  if (!found) {
+    // Try/catch is used to avoid race conditions
+    try {
+      found = await new ChatModel({ cid: id }).save()
+    } catch (err) {
+      found = await ChatModel.findOne({ cid: id })
     }
-    return user
+  }
+  return found
 }
 
 export async function findChat(id: number) {
-    return await ChatModel.findOne({ cid: id })
+  return await ChatModel.findOne({ cid: id })
 }
