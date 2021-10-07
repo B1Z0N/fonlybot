@@ -7,7 +7,6 @@ import { log } from '@/helpers/log'
 import { i18n } from '@/helpers/i18n'
 import { randomBytes } from 'crypto'
 import { adminOrPrivateComposer } from '@/helpers/composers'
-import { promises as fs } from 'fs'
 
 export async function setupAuthHandlers(
     bot: Telegraf<MongoSessionContext>,

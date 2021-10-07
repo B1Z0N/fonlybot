@@ -13,14 +13,15 @@ import { attachChat } from '@/middlewares/dbchat'
 
 // Commands
 import { setupHelpHandlers } from '@/handlers/help'
-import { setupAuthHandlers } from './handlers/auth'
-import { setupUploadHandlers } from './handlers/upload'
+import { setupAuthHandlers } from '@/handlers/auth'
+import { setupUploadHandlers } from '@/handlers/upload'
 import { setupLanguageHandlers } from '@/handlers/language'
+import { setupChatHandlers } from '@/handlers/chat'
 
 // Other
 import { bot } from '@/helpers/bot'
 import { IAuthorization, GoogleInit } from '@/helpers/google/google'
-import { mongoConnect } from './models'
+import { mongoConnect } from '@/models'
 import { log } from '@/helpers/log'
 ;(async function main() {
     const auth = await GoogleInit()
@@ -37,6 +38,7 @@ import { log } from '@/helpers/log'
     setupLanguageHandlers(bot)
     await setupAuthHandlers(bot, auth)
     setupUploadHandlers(bot, auth)
+    setupChatHandlers(bot)
 
     // Errors
     bot.catch((err, ctx) => {

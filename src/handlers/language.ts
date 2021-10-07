@@ -1,20 +1,21 @@
-import { Composer, Context, Markup as m, Telegraf } from 'telegraf'
+import { Composer, Markup as m, Telegraf } from 'telegraf'
+import { MongoSessionContext } from '@/helpers/bot'
 import { readdirSync, readFileSync } from 'fs'
 import { safeLoad } from 'js-yaml'
 import { adminOrPrivateComposer, isAdminOrPrivate } from '@/helpers/composers'
 
-export function setupLanguageHandlers(bot: Telegraf) {
+export function setupLanguageHandlers(bot: Telegraf<MongoSessionContext>) {
     bot.command('language', adminOrPrivateComposer(sendLanguage))
     bot.action(localeActions, setLanguage)
 }
 
 const localeActions = localesFiles().map((file) => file.split('.')[0])
 
-function sendLanguage(ctx: Context) {
+function sendLanguage(ctx: MongoSessionContext) {
     return ctx.reply(ctx.t('language'), languageKeyboard())
 }
 
-async function setLanguage(ctx: Context) {
+async function setLanguage(ctx: MongoSessionContext) {
     let chat = ctx.dbchat
     if (!(await isAdminOrPrivate(ctx, ctx.callbackQuery.from.id))) {
         return ctx.answerCbQuery(ctx.t('admin_only'))

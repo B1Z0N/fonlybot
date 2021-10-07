@@ -45,6 +45,11 @@ export class Chat {
 
     @prop()
     public to_edit_id?: number
+
+    // a user that added the bot to the chat has the same permissions
+    // as admins of the chat
+    @prop()
+    public adminid: number
 }
 
 // Get User model
