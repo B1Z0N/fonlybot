@@ -4,18 +4,19 @@ import { readdirSync, readFileSync } from 'fs'
 import { safeLoad } from 'js-yaml'
 import { adminOrPrivateComposer, isAdminOrPrivate } from '@/helpers/composers'
 
-export function setupLanguageHandlers(bot: Telegraf<MongoSessionContext>) {
+export function setupLanguageHandlers(bot: Telegraf<MongoSessionContext>, onFirstLangSetup: (ctx: MongoSessionContext) => Promise<void>) {
   bot.command('language', adminOrPrivateComposer(sendLanguage))
-  bot.action(localeActions, setLanguage)
+  bot.action(localeActions, setLanguage(onFirstLangSetup))
 }
 
 const localeActions = localesFiles().map((file) => file.split('.')[0])
 
-function sendLanguage(ctx: MongoSessionContext) {
+export function sendLanguage(ctx: MongoSessionContext) {
   return ctx.reply(ctx.t('language'), languageKeyboard())
 }
 
-async function setLanguage(ctx: MongoSessionContext) {
+function setLanguage(onFirstLangSetup: (ctx: MongoSessionContext) => Promise<void>) {
+  return async function(ctx: MongoSessionContext) {
   let chat = ctx.dbchat
   if (!(await isAdminOrPrivate(ctx, ctx.callbackQuery.from.id))) {
     return ctx.answerCbQuery(ctx.t('admin_only'))
@@ -36,8 +37,13 @@ async function setLanguage(ctx: MongoSessionContext) {
       { parse_mode: 'HTML' }
     )
   }
+  
+  if (onFirstLangSetup && !ctx.dbchat.inited) {
+    await onFirstLangSetup(ctx)
+    await ctx.dbchat.updateOne({ inited: true })
 }
-
+}
+}
 function languageKeyboard() {
   const locales = localesFiles()
   const result = []

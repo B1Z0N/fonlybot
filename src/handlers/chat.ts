@@ -1,6 +1,6 @@
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
-import { startHandler } from '@/handlers/help'
+import { sendLanguage } from '@/handlers/language'
 import { IAuthorization } from '@/helpers/google/google'
 
 export function setupChatHandlers(bot: Telegraf<MongoSessionContext>, auth: IAuthorization) {
@@ -8,7 +8,7 @@ export function setupChatHandlers(bot: Telegraf<MongoSessionContext>, auth: IAut
     const status = ctx.myChatMember.new_chat_member.status
     if (status == 'member') {
       await ctx.dbchat.updateOne({ adminid: ctx.myChatMember.from.id })
-      await startHandler(auth)(ctx)
+      await sendLanguage(ctx)
     } else if (status == 'left') {
       await ctx.dbchat.deleteOne()
     }

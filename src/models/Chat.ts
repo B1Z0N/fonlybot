@@ -32,6 +32,9 @@ export class Chat {
 
   @prop()
   public folderId: string
+
+  @prop({ default: false })
+  public inited: boolean
 }
 
 // Get User model

@@ -12,7 +12,7 @@ import { getMongoSession } from '@/middlewares/mongoSession'
 import { attachChat } from '@/middlewares/dbchat'
 
 // Commands
-import { setupHelpHandlers } from '@/handlers/help'
+import { setupHelpHandlers, startHandler } from '@/handlers/help'
 import { setupAuthHandlers } from '@/handlers/auth'
 import { setupUploadHandlers } from '@/handlers/upload'
 import { setupLanguageHandlers } from '@/handlers/language'
@@ -35,7 +35,7 @@ import { log } from '@/helpers/log'
 
   // Commands & actions
   await setupHelpHandlers(bot, auth)
-  setupLanguageHandlers(bot)
+  setupLanguageHandlers(bot, startHandler(auth))
   await setupAuthHandlers(bot, auth)
   setupUploadHandlers(bot, auth)
   setupChatHandlers(bot, auth)

@@ -1,7 +1,9 @@
 import { Utils, IAuthorization } from '@/helpers/google/google'
 import { Telegraf } from 'telegraf'
+import { MongoSessionContext } from '@/helpers/bot'
 import { findGoogleData } from '@/models/Google'
 import { googleHandler } from '@/handlers/auth'
+import { sendLanguage } from '@/handlers/language'
 
 function helpHandlerMsg(ctx) {
     let msg = `${ctx.t('help_html')}\n`
@@ -32,9 +34,10 @@ export function startHandler(auth: IAuthorization) {
         await googleHandler(auth)(ctx)
     }
 
+
 }
 
-export async function setupHelpHandlers(bot: Telegraf, auth: IAuthorization) {
+export async function setupHelpHandlers(bot: Telegraf<MongoSessionContext>, auth: IAuthorization) {
   bot.command('help', ctx => ctx.replyWithHTML(helpHandlerMsg(ctx)))
-  bot.command('start', startHandler(auth))
+  bot.command('start', sendLanguage)
 }
