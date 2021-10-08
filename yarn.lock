@@ -240,6 +240,11 @@
     "readable-stream" "^2.3.5"
     "safe-buffer" "^5.1.1"
 
+"bottleneck@^2.19.5":
+  "integrity" "sha512-VHiNCbI1lKdl44tGrhNfU3lup0Tj/ZBMJB5/2ZbNXRCPuRCO7ed2mgcK4r17y+KB2EfuYuRaVlwNbAeaWGSpbw=="
+  "resolved" "https://registry.npmjs.org/bottleneck/-/bottleneck-2.19.5.tgz"
+  "version" "2.19.5"
+
 "boxen@^4.2.0":
   "integrity" "sha512-eB4uT9RGzg2odpER62bBwSLvUeGC+WbRjjyyFhGsKnc8wp/m0+hQsMUvUe3H2V0D5vw0nBdO1hCJoZo5mKeuIQ=="
   "resolved" "https://registry.npmjs.org/boxen/-/boxen-4.2.0.tgz"
@@ -1961,7 +1966,14 @@
   dependencies:
     "mongodb" "^3.6.4"
 
-"telegraf@^3.7.1", "telegraf@^4.4.2":
+"telegraf-throttler@^0.6.0":
+  "integrity" "sha512-RgoS1lJFdEgIL2WBf9k5nDA9lVTXNjIVRalTwIv81yg7fj0ZmYAvqAtsQRHHUqKS2f+fXuWuZWG0Yv8NFvHQRw=="
+  "resolved" "https://registry.npmjs.org/telegraf-throttler/-/telegraf-throttler-0.6.0.tgz"
+  "version" "0.6.0"
+  dependencies:
+    "bottleneck" "^2.19.5"
+
+"telegraf@^3.7.1", "telegraf@^4.3.0", "telegraf@^4.4.2":
   "integrity" "sha512-OGt9w1LbxYUOsRk3htAavBnL9hqWycmJNiOmS74oARzxKFnYS/MdwW8b5CX9VLCJt537AXkm8/eBNiEYD8E7lQ=="
   "resolved" "https://registry.npmjs.org/telegraf/-/telegraf-4.4.2.tgz"
   "version" "4.4.2"

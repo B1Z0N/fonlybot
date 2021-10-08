@@ -4,8 +4,7 @@ import 'module-alias/register'
 // Config dotenv
 import * as path from 'path'
 import * as dotenv from 'dotenv'
-dotenv.config({ path: path.join(process.cwd(),'.env') })
-
+dotenv.config({ path: path.join(process.cwd(),'.env') }) 
 // Middlewares
 import { ignoreOldMessageUpdates } from '@/middlewares/ignoreOldMessageUpdates'
 import { i18n, attachI18N } from '@/helpers/i18n'
@@ -24,6 +23,9 @@ import { bot } from '@/helpers/bot'
 import { IAuthorization, GoogleInit } from '@/helpers/google/google'
 import { mongoConnect } from '@/models'
 import { log } from '@/helpers/log'
+import { telegrafThrottler } from 'telegraf-throttler'
+import Bottleneck from 'telegraf-throttler'
+
 ;(async function main() {
   const auth = await GoogleInit()
   await mongoConnect()
@@ -33,6 +35,22 @@ import { log } from '@/helpers/log'
   bot.use(attachChat)
   bot.use(i18n.middleware(), attachI18N)
   bot.use(getMongoSession())
+  bot.use(telegrafThrottler({
+    in: {
+        maxConcurrent: 5,
+        highWater: 10,
+        strategy: Bottleneck.strategy.BLOCK,
+    }, 
+    out: {
+        maxConcurrent: 5,
+    }, 
+    group: {
+        maxConcurrent: 5,
+    },
+    inThrottlerError: async (ctx, next, error) => {
+        return ctx.reply('too much, calm down')
+    } 
+  }))
 
   // Commands & actions
   await setupHelpHandlers(bot, auth)
