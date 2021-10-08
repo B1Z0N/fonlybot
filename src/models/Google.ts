@@ -8,14 +8,14 @@ export class GoogleData implements Auth.Credentials {
   @prop()
   public refresh_token: string
 
-   @prop()
-   public scope?: string
+  @prop()
+  public scope?: string
 
-   @prop()
-   public token_type?: string
+  @prop()
+  public token_type?: string
 
-   @prop()
-   public expiry_date?: number
+  @prop()
+  public expiry_date?: number
 
   @prop({ required: true, index: true, unique: true })
   public email: string
@@ -40,11 +40,9 @@ export async function findOrCreateGoogleData(
   }
 
   await found.updateOne(creds)
-    console.log(creds)
   return found
 }
 
 export async function findGoogleData(email: string) {
   return await GoogleCredentialsModel.findOne({ email })
 }
-

@@ -3,7 +3,10 @@ import { Telegraf } from 'telegraf'
 import { sendLanguage } from '@/handlers/language'
 import { IAuthorization } from '@/helpers/google/google'
 
-export function setupChatHandlers(bot: Telegraf<MongoSessionContext>, auth: IAuthorization) {
+export function setupChatHandlers(
+  bot: Telegraf<MongoSessionContext>,
+  auth: IAuthorization
+) {
   bot.on('my_chat_member', async (ctx) => {
     const status = ctx.myChatMember.new_chat_member.status
     if (status == 'member') {

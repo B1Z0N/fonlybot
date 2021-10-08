@@ -59,7 +59,7 @@ export function setupUploadHandlers(
     const initiatedMsg = await ctx.reply(ctx.t('upload_initiated'), {
       reply_to_message_id: ctx.message.message_id,
     })
-
+    try {
       const tgFileUrl = (await ctx.telegram.getFileLink(fileId)).toString()
       const response = await axios.get(tgFileUrl, {
         responseType: 'stream',
@@ -88,5 +88,17 @@ export function setupUploadHandlers(
           .replace('{1}', googleFileUrl),
         { parse_mode: 'Markdown', disable_web_page_preview: true }
       )
- })
+    } catch (err) {
+      log.error(
+        `[c=${ctx.dbchat.cid}] Error on uploading file to the drive: ${err}`
+      )
+      return ctx.telegram.editMessageText(
+        initiatedMsg.chat.id,
+        initiatedMsg.message_id,
+        undefined,
+        ctx.t('upload_failure_md').replace('{0}', fileName),
+        { parse_mode: 'Markdown' }
+      )
+    }
+  })
 }
