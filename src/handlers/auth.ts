@@ -1,6 +1,6 @@
 import { IAuthorization } from '@/helpers/google/google'
 import { OAuthSubscribe } from '@/helpers/google/server'
-import { findChat } from '@/models'
+import { findChat } from '@/models' 
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import { log } from '@/helpers/log'
@@ -63,14 +63,24 @@ export async function setupAuthHandlers(
 
   bot.command(
     'google',
-    adminOrPrivateComposer(async (ctx) => {
+    adminOrPrivateComposer(googleHandler(auth))
+  )
+
+  bot.command(
+    'signout',
+    adminOrPrivateComposer(signoutHandler)
+  )
+}
+
+export function googleHandler(auth: IAuthorization) {
+    return async function(ctx) {
       if (ctx.dbchat.to_edit_id) {
         await ctx.deleteMessage(ctx.dbchat.to_edit_id)
       }
 
       const onetimepass = randomBytes(20).toString('hex')
       const state = {
-        cid: ctx.message.chat.id,
+        cid: ctx.chat.id,
         chat_type: ctx.chat_type,
         chat_title: 'title' in ctx.chat ? ctx.chat.title : '',
         onetimepass,
@@ -86,16 +96,12 @@ export async function setupAuthHandlers(
       ).message_id
 
       await ctx.dbchat.save()
-    })
-  )
+    }
+}
 
-  bot.command(
-    'signout',
-    adminOrPrivateComposer(async (ctx) => {
+    export async function signoutHandler(ctx) {
       ctx.dbchat.email = undefined
       await ctx.dbchat.save()
 
       return ctx.replyWithMarkdown(ctx.t('google_signout'))
-    })
-  )
-}
+    }

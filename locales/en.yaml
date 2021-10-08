@@ -1,6 +1,6 @@
 name: English
-hello_html_pr: Hi, {name}👋
-hello_html_pub: Hi 👋
+hello_html_pr: Hi, {name}👋. 
+hello_html_pub: Hi 👋. 
 help_html_pr: |
     Authorize with /google for the first time, give me any file and get your link. Yeah, that simple!
 help_html_pub: |
