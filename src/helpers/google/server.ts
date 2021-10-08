@@ -6,8 +6,9 @@ import { log } from '@/helpers/log'
 import { ChatType } from '@/middlewares/dbchat'
 import { i18n } from '@/helpers/i18n'
 import * as Mustache from 'mustache'
+import * as path from 'path'
 
-export const TEMPLATE_FOLDER = `${process.cwd()}/static/templates`
+export const TEMPLATE_FOLDER = path.join(process.cwd(), 'static/templates')
 export const PORT = +process.env.CB_PORT
 
 export interface OAuthCallback {

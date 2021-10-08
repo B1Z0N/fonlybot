@@ -2,8 +2,9 @@
 import 'module-alias/register'
 
 // Config dotenv
+import * as path from 'path'
 import * as dotenv from 'dotenv'
-dotenv.config({ path: `${process.cwd()}/.env` })
+dotenv.config({ path: path.join(process.cwd(),'.env') })
 
 // Middlewares
 import { ignoreOldMessageUpdates } from '@/middlewares/ignoreOldMessageUpdates'

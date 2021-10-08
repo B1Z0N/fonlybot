@@ -2,8 +2,9 @@ import { promises as fs } from 'fs'
 import { google, Auth, drive_v3 } from 'googleapis'
 import { Readable } from 'stream'
 import * as mime from 'mime-types'
+import * as path from 'path'
 
-const CREDENTIALS_PATH = `${process.cwd()}/credentials.json`
+const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json')
 export async function GoogleInit() {
   const credentials = await fs.readFile(CREDENTIALS_PATH)
   return GoogleAuth.build(credentials)

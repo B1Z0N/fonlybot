@@ -33,11 +33,14 @@ export function startHandler(auth: IAuthorization) {
         await ctx.replyWithHTML(startHandlerMsg(ctx))
         await googleHandler(auth)(ctx)
     }
-
-
 }
 
 export async function setupHelpHandlers(bot: Telegraf<MongoSessionContext>, auth: IAuthorization) {
   bot.command('help', ctx => ctx.replyWithHTML(helpHandlerMsg(ctx)))
-  bot.command('start', sendLanguage)
+  bot.command('start', async ctx => {
+         if (ctx.dbchat.inited) {
+            return startHandler(auth)(ctx)
+         } else { 
+            return sendLanguage(ctx)
+         }})
 }
