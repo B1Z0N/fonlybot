@@ -40,8 +40,11 @@ export function setupUploadHandlers(
   bot.on('document', async (ctx) => {
     if (!ctx.dbchat.active) return
     if (ignoredMimeTypes.has(ctx.message.document.mime_type)) return
-    if (!ctx.dbchat.email && ctx.chat_type == 'pr') {
-      return ctx.replyWithMarkdown(ctx.t('authorize_first_md'))
+    if (!ctx.dbchat.email)
+    { 
+        if (ctx.chat_type == 'pr')
+            return ctx.replyWithMarkdown(ctx.t('authorize_first_md'))
+        return
     }
 
     const {
