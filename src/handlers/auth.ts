@@ -66,7 +66,9 @@ export async function setupAuthHandlers(
 export function googleHandler(auth: IAuthorization) {
   return async function (ctx) {
     if (ctx.dbchat.to_edit_id) {
-      await ctx.deleteMessage(ctx.dbchat.to_edit_id)
+      await ctx.deleteMessage(ctx.dbchat.to_edit_id).catch(e => {
+        log.info(`[${ctx.dbchat.id}] The message was already deleted by someone.`)
+      })
     }
 
     const onetimepass = randomBytes(20).toString('hex')
