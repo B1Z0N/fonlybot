@@ -20,6 +20,7 @@ export async function GoogleInit() {
 const SCOPES = [
   'openid email',
   'https://www.googleapis.com/auth/drive.file',
+  // removed in favour of 'openid email'
   //'https://www.googleapis.com/auth/userinfo.email',
   //'https://www.googleapis.com/auth/userinfo.profile',
 ]

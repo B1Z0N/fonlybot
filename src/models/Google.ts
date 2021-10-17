@@ -17,8 +17,11 @@ export class GoogleData implements Auth.Credentials {
   @prop()
   public expiry_date?: number
 
-  @prop({ required: true, index: true, unique: true })
+  @prop()
   public email: string
+
+  @prop({ required: true, index: true, unique: true })
+  public userId: string
 }
 
 const GoogleCredentialsModel = getModelForClass(GoogleData, {
@@ -26,23 +29,25 @@ const GoogleCredentialsModel = getModelForClass(GoogleData, {
 })
 
 export async function findOrCreateGoogleData(
+  userId: string,
   email: string,
   creds: Auth.Credentials
 ) {
-  let found = await GoogleCredentialsModel.findOne({ email })
+  let found = await GoogleCredentialsModel.findOne({ userId })
   if (!found) {
     // Try/catch is used to avoid race conditions
     try {
-      found = new GoogleCredentialsModel({ email })
+      found = new GoogleCredentialsModel({ userId })
     } catch (err) {
-      found = await GoogleCredentialsModel.findOne({ email })
+      found = await GoogleCredentialsModel.findOne({ userId })
     }
   }
 
-  await found.updateOne(creds)
-  return found
+  const tosave = Object.assign(found, { ...creds, email })
+  await tosave.save()
+  return tosave
 }
 
-export async function findGoogleData(email: string) {
-  return await GoogleCredentialsModel.findOne({ email })
+export async function findGoogleData(userId: string) {
+  return await GoogleCredentialsModel.findOne({ userId })
 }

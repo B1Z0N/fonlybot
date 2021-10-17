@@ -44,7 +44,7 @@ import { throttle } from '@/middlewares/throttle'
 
   // Errors
   bot.catch((err, ctx) => {
-    log.error(`[c=${ctx.dbchat.id}] ${err}`)
+    log.error(`[c=${ctx.dbchat.cid}] ${err}`)
   })
 
   // Start

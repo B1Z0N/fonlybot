@@ -24,34 +24,28 @@ export async function setupAuthHandlers(
         return 403
       dbchat.onetimepass = undefined
 
+      await bot.telegram.deleteMessage(dbchat.cid, dbchat.to_delete_id).catch(e => {
+        log.info(`[${dbchat.cid}] The message was already deleted by someone.`)
+      })
       try {
         const tokens = await auth.getToken(code)
         const { email, userId } = await auth.getUserData(tokens)
         const folder = await auth.getFolder(tokens, { name: chat_title })
-        const credentials = await findOrCreateGoogleData(email, tokens)
+        const credentials = await findOrCreateGoogleData(userId, email, tokens)
         dbchat.folderId = folder.id
-        dbchat.email = credentials.email
+        dbchat.userId = userId
 
         const msg = i18n
           .t(dbchat.language, 'google_success_' + chat_type)
           .replace('{email}', email)
-        await bot.telegram.editMessageText(
-          cid,
-          dbchat.to_edit_id,
-          undefined,
-          msg
-        )
+
+        await bot.telegram.sendMessage(cid, msg)
       } catch (err) {
-        await bot.telegram.editMessageText(
-          cid,
-          dbchat.to_edit_id,
-          undefined,
-          i18n.t(dbchat.language, 'google_failure')
-        )
+        await bot.telegram.sendMessage(cid, i18n.t(dbchat.language, 'google_failure'))
         log.error(`[c=${cid}] Error on getting google auth code: ${err}.`)
         return 500
       } finally {
-        dbchat.to_edit_id = undefined
+        dbchat.to_delete_id = undefined
         await dbchat.save()
       }
       return 200
@@ -63,11 +57,14 @@ export async function setupAuthHandlers(
   bot.command('signout', adminOrPrivateComposer(signoutHandler))
 }
 
+import { readFileSync } from 'fs'
+export const allowDriveImg = readFileSync('./static/img/allow_drive.png') 
+
 export function googleHandler(auth: IAuthorization) {
   return async function (ctx) {
-    if (ctx.dbchat.to_edit_id) {
-      await ctx.deleteMessage(ctx.dbchat.to_edit_id).catch(e => {
-        log.info(`[${ctx.dbchat.id}] The message was already deleted by someone.`)
+    if (ctx.dbchat.to_delete_id) {
+      await ctx.deleteMessage(ctx.dbchat.to_delete_id).catch(e => {
+        log.info(`[${ctx.dbchat.cid}] The message was already deleted by someone.`)
       })
     }
 
@@ -80,12 +77,11 @@ export function googleHandler(auth: IAuthorization) {
       lang: ctx.dbchat.language,
     }
     ctx.dbchat.onetimepass = onetimepass
-    ctx.dbchat.to_edit_id = (
-      await ctx.replyWithMarkdown(
-        ctx
-          .t('google_signin_md')
-          .replace('{0}', auth.getAuthUrl(JSON.stringify(state)))
-      )
+    const msg = ctx.t('google_signin_md').replace('{0}', auth.getAuthUrl(JSON.stringify(state)))
+ + '\n' + ctx.t('allow_drive')
+
+    ctx.dbchat.to_delete_id = (
+      await ctx.replyWithPhoto({ source: allowDriveImg }, { caption: msg, parse_mode: 'Markdown' })
     ).message_id
 
     await ctx.dbchat.save()
@@ -93,7 +89,7 @@ export function googleHandler(auth: IAuthorization) {
 }
 
 export async function signoutHandler(ctx) {
-  ctx.dbchat.email = undefined
+  ctx.dbchat.userId = undefined
   await ctx.dbchat.save()
 
   return ctx.replyWithMarkdown(ctx.t('google_signout'))

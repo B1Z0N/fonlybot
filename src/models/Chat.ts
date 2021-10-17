@@ -8,8 +8,8 @@ export class Chat {
   @prop({ required: true, default: 'en' })
   public language: string
 
-  @prop()
-  public email?: string
+  @prop({ unique: true })
+  public userId?: string
 
   @prop()
   public onetimepass?: string
@@ -23,7 +23,7 @@ export class Chat {
   public to_delete_ids: number[]
 
   @prop()
-  public to_edit_id?: number
+  public to_delete_id?: number
 
   // a user that added the bot to the chat has the same permissions
   // as admins of the chat

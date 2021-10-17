@@ -5,16 +5,17 @@ import { findGoogleData } from '@/models/Google'
 import { googleHandler } from '@/handlers/auth'
 import { sendLanguage } from '@/handlers/language'
 
-function helpHandlerMsg(ctx) {
+async function helpHandlerMsg(ctx) {
   let msg = `${ctx.t('help_html')}\n`
 
-  if (!ctx.dbchat.email) {
+  if (!ctx.dbchat.userId) {
     msg += ctx.t('not_authorized_html')
   } else {
     const folderLink = Utils.sharedFolderLink(ctx.dbchat.folderId)
+    const { email } = await findGoogleData(ctx.dbchat.userId)
     msg += ctx
       .t('authorized_html')
-      .replace('{email}', ctx.dbchat.email)
+      .replace('{email}', email)
       .replace('{folder}', folderLink)
   }
 
@@ -39,7 +40,7 @@ export async function setupHelpHandlers(
   bot: Telegraf<MongoSessionContext>,
   auth: IAuthorization
 ) {
-  bot.command('help', (ctx) => ctx.replyWithHTML(helpHandlerMsg(ctx)))
+  bot.command('help', async (ctx) => ctx.replyWithHTML(await helpHandlerMsg(ctx)))
   bot.command('start', async (ctx) => {
     if (ctx.dbchat.inited) {
       return startHandler(auth)(ctx)
