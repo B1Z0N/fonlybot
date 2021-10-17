@@ -26,7 +26,7 @@ export async function setupAuthHandlers(
 
       try {
         const tokens = await auth.getToken(code)
-        const email = await auth.getEmail(tokens)
+        const { email, userId } = await auth.getUserData(tokens)
         const folder = await auth.getFolder(tokens, { name: chat_title })
         const credentials = await findOrCreateGoogleData(email, tokens)
         dbchat.folderId = folder.id

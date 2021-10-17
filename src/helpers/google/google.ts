@@ -4,24 +4,49 @@ import { Readable } from 'stream'
 import * as mime from 'mime-types'
 import * as path from 'path'
 
+
+//////////////////////////////////////////////////
+// Constants
+//////////////////////////////////////////////////
+
+
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json')
+
 export async function GoogleInit() {
   const credentials = await fs.readFile(CREDENTIALS_PATH)
   return GoogleAuth.build(credentials)
 }
 
 const SCOPES = [
+  'openid email',
   'https://www.googleapis.com/auth/drive.file',
-  'https://www.googleapis.com/auth/userinfo.email',
-  'https://www.googleapis.com/auth/userinfo.profile',
+  //'https://www.googleapis.com/auth/userinfo.email',
+  //'https://www.googleapis.com/auth/userinfo.profile',
 ]
+
 const FOLDER_NAME = 'fonly'
+
+
+//////////////////////////////////////////////////
+// Interfaces
+//////////////////////////////////////////////////
+
 
 export interface GDriveFile {
   id?: string
   name?: string
   link?: string
   parentId?: string
+}
+
+export interface IUploadInfo {
+  url: string
+  folderId?: string
+}
+
+export interface UserData {
+    email: string,
+    userId: string,
 }
 
 export interface IAuthorization {
@@ -39,13 +64,14 @@ export interface IAuthorization {
     folder: GDriveFile
   ) => Promise<GDriveFile>
 
-  getEmail: (token: Auth.Credentials) => Promise<string>
+  getUserData: (token: Auth.Credentials) => Promise<UserData>,
 }
 
-export interface IUploadInfo {
-  url: string
-  folderId?: string
-}
+
+//////////////////////////////////////////////////
+// Classes
+//////////////////////////////////////////////////
+
 
 class GoogleAuth implements IAuthorization {
   auth: Auth.OAuth2Client
@@ -76,17 +102,17 @@ class GoogleAuth implements IAuthorization {
 
   async getToken(code: string) {
     const { tokens } = await this.auth.getToken(code)
+
     return tokens
   }
 
-  async getEmail(token: Auth.Credentials) {
-    this.auth.setCredentials(token)
-    const people = google.people({ version: 'v1', auth: this.auth })
-    const me = await people.people.get({
-      resourceName: 'people/me',
-      personFields: 'emailAddresses',
-    })
-    return me.data.emailAddresses[0].value
+  async getUserData(tokens: Auth.Credentials) {
+    this.auth.setCredentials(tokens)
+    const ticket = await this.auth.verifyIdToken({ idToken: tokens.id_token })
+    const { email } = ticket.getPayload()
+    const userId = ticket.getUserId()
+
+    return { email, userId }
   }
 
   async upload(
