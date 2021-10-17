@@ -8,6 +8,9 @@ import { i18n } from '@/helpers/i18n'
 import { randomBytes } from 'crypto'
 import { adminOrPrivateComposer } from '@/helpers/composers'
 import { findOrCreateGoogleData } from '@/models/Google'
+import { readFileSync } from 'fs'
+
+export const allowDriveImg = readFileSync('./static/img/allow_drive.png') 
 
 export async function setupAuthHandlers(
   bot: Telegraf<MongoSessionContext>,
@@ -30,7 +33,15 @@ export async function setupAuthHandlers(
       try {
         const tokens = await auth.getToken(code)
         const { email, userId } = await auth.getUserData(tokens)
-        const folder = await auth.getFolder(tokens, { name: chat_title })
+
+        let folder;
+        try {
+            folder = await auth.getFolder(tokens, { name: chat_title })
+        } catch (err) {
+            await bot.telegram.sendPhoto(cid, { source: allowDriveImg }, { caption: i18n.t(dbchat.language, 'upload_denied'), parse_mode: 'Markdown' })
+            log.error(`[c=${cid}] Error on creating folder: ${err}.`)
+            return 500
+        }
         const credentials = await findOrCreateGoogleData(userId, email, tokens)
         dbchat.folderId = folder.id
         dbchat.userId = userId
@@ -56,9 +67,6 @@ export async function setupAuthHandlers(
 
   bot.command('signout', adminOrPrivateComposer(signoutHandler))
 }
-
-import { readFileSync } from 'fs'
-export const allowDriveImg = readFileSync('./static/img/allow_drive.png') 
 
 export function googleHandler(auth: IAuthorization) {
   return async function (ctx) {

@@ -35,7 +35,7 @@ upload_initiated: Upload initiated ⏳.
 upload_success_md: Successfully uploaded ["{0}"]({1}) ✅.
 upload_failure_md: Failure on "{0}" upload ❌, try again.
 upload_too_big: The file "{0}" is too big ❌, no more than 20mb allowed.
-upload_denied: Reauthorize with /google and make sure to allow me uploading your telegram docs to google drive.
+upload_denied: Oops, it's impossible for me to work without this checkmark. Reauthorize with /google and make sure to allow me uploading your telegram docs to google drive.
 
 authorize_first_md: Authorize with /google before sending any docs.
 
