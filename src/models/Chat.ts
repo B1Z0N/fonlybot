@@ -83,7 +83,7 @@ export class MessageDeleter {
     return Promise.all(towait)
   }
 
-  static push(dbchat: Chat & Document<any, BeAnObject, any>, msgs: [Message] | Message) {
+  static push(dbchat: Chat & Document<any, BeAnObject, any>, msgs: Array<Message> | Message) {
     let ids = Array.isArray(msgs) ? msgs.map(m => m.message_id) : [msgs.message_id]
     return dbchat.updateOne({ to_delete_ids: [...dbchat.to_delete_ids, ...ids] })
   }
