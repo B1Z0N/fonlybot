@@ -1,6 +1,6 @@
 import { IAuthorization } from '@/helpers/google/google'
 import { OAuthSubscribe } from '@/helpers/google/server'
-import { findChat } from '@/models'
+import { findChat, MessageDeleter } from '@/models'
 import { MongoSessionContext } from '@/helpers/bot'
 import { Telegraf } from 'telegraf'
 import { log } from '@/helpers/log'
@@ -10,7 +10,7 @@ import { adminOrPrivateComposer } from '@/helpers/composers'
 import { findOrCreateGoogleData } from '@/models/Google'
 import { readFileSync } from 'fs'
 
-export const allowDriveImg = readFileSync('./static/img/allow_drive.png') 
+export const allowDriveImg = readFileSync('./static/img/allow_drive.png')
 
 export async function setupAuthHandlers(
   bot: Telegraf<MongoSessionContext>,
@@ -27,21 +27,26 @@ export async function setupAuthHandlers(
         return 403
       dbchat.onetimepass = undefined
 
+      await MessageDeleter.process(bot.telegram, dbchat)
 
-      await bot.telegram.deleteMessage(dbchat.cid, dbchat.to_delete_id).catch(e => {
-        log.info(`[${dbchat.cid}] The message was already deleted by someone.`)
-      })
       try {
         const tokens = await auth.getToken(code)
         const { email, userId } = await auth.getUserData(tokens)
 
-        let folder;
+        let folder
         try {
-            folder = await auth.getFolder(tokens, { name: chat_title })
+          folder = await auth.getFolder(tokens, { name: chat_title })
         } catch (err) {
-            await bot.telegram.sendPhoto(cid, { source: allowDriveImg }, { caption: i18n.t(dbchat.language, 'upload_denied'), parse_mode: 'Markdown' })
-            log.error(`[c=${cid}] Error on creating folder: ${err}.`)
-            return 500
+          await bot.telegram.sendPhoto(
+            cid,
+            { source: allowDriveImg },
+            {
+              caption: i18n.t(dbchat.language, 'upload_denied'),
+              parse_mode: 'Markdown',
+            }
+          )
+          log.error(`[c=${cid}] Error on creating folder: ${err}.`)
+          return 500
         }
         const credentials = await findOrCreateGoogleData(userId, email, tokens)
         dbchat.folderId = folder.id
@@ -53,11 +58,13 @@ export async function setupAuthHandlers(
 
         await bot.telegram.sendMessage(cid, msg)
       } catch (err) {
-        await bot.telegram.sendMessage(cid, i18n.t(dbchat.language, 'google_failure'))
+        await bot.telegram.sendMessage(
+          cid,
+          i18n.t(dbchat.language, 'google_failure')
+        )
         log.error(`[c=${cid}] Error on getting google auth code: ${err}.`)
         return 500
       } finally {
-        dbchat.to_delete_id = undefined
         await dbchat.save()
       }
       return 200
@@ -71,11 +78,7 @@ export async function setupAuthHandlers(
 
 export function googleHandler(auth: IAuthorization) {
   return async function (ctx) {
-    if (ctx.dbchat.to_delete_id) {
-      await ctx.deleteMessage(ctx.dbchat.to_delete_id).catch(e => {
-        log.info(`[${ctx.dbchat.cid}] The message was already deleted by someone.`)
-      })
-    }
+    await MessageDeleter.process(ctx.telegram, ctx.dbchat)
 
     const onetimepass = randomBytes(20).toString('hex')
     const state = {
@@ -86,13 +89,18 @@ export function googleHandler(auth: IAuthorization) {
       lang: ctx.dbchat.language,
     }
     ctx.dbchat.onetimepass = onetimepass
-    const msg = ctx.t('google_signin_md').replace('{0}', auth.getAuthUrl(JSON.stringify(state)))
- + '\n' + ctx.t('allow_drive')
+    const msgText =
+      ctx
+        .t('google_signin_md')
+        .replace('{0}', auth.getAuthUrl(JSON.stringify(state))) +
+      '\n' +
+      ctx.t('allow_drive')
 
-    ctx.dbchat.to_delete_id = (
-      await ctx.replyWithPhoto({ source: allowDriveImg }, { caption: msg, parse_mode: 'Markdown' })
-    ).message_id
-
+    const msg = await ctx.replyWithPhoto(
+      { source: allowDriveImg },
+      { caption: msgText, parse_mode: 'Markdown' }
+    )
+    await MessageDeleter.push(ctx.dbchat, msg.message_id)
     await ctx.dbchat.save()
   }
 }

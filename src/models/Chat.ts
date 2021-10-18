@@ -1,5 +1,9 @@
 import { prop, getModelForClass, Ref } from '@typegoose/typegoose'
-import { GoogleData } from '@/models/Google'
+import { log } from '@/helpers/log'
+import { Telegraf, Telegram } from 'telegraf'
+import { MongoSessionContext } from '@/helpers/bot'
+import { BeAnObject } from '@typegoose/typegoose/lib/types'
+import { Document } from 'mongoose'
 
 export class Chat {
   @prop({ required: true, index: true, unique: true })
@@ -21,9 +25,6 @@ export class Chat {
 
   @prop({ type: Number })
   public to_delete_ids: number[]
-
-  @prop()
-  public to_delete_id?: number
 
   // a user that added the bot to the chat has the same permissions
   // as admins of the chat
@@ -58,4 +59,28 @@ export async function findOrCreateChat(id: number) {
 
 export async function findChat(id: number) {
   return await ChatModel.findOne({ cid: id })
+}
+
+export class MessageDeleter {
+  static process(
+    tg: Telegram,
+    dbchat: Chat & Document<any, BeAnObject, any>
+  ) {
+    const towait = []
+
+    for (let todelid of dbchat.to_delete_ids) {
+      towait.push(
+        tg.deleteMessage(dbchat.cid, todelid).catch(e => {
+          log.info(`[${dbchat.cid}] The message was already deleted by someone.`)
+        })
+      )
+    }
+
+    towait.push(dbchat.updateOne({ to_delete_ids: [] }))
+    return Promise.all(towait)
+  }
+
+  static push(dbchat: Chat & Document<any, BeAnObject, any>, id: number) {
+    return dbchat.updateOne({ to_delete_ids: [...dbchat.to_delete_ids, id] })
+  }
 }
