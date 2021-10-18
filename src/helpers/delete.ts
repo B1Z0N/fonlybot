@@ -10,11 +10,9 @@ import { adminOrPrivateComposer } from '@/helpers/composers'
 import { findOrCreateGoogleData } from '@/models/Google'
 import { readFileSync } from 'fs'
 
-export const allowDriveImg = readFileSync('./static/img/allow_drive.png') 
-
 export async function setupAuthHandlers(
   bot: Telegraf<MongoSessionContext>,
-  auth: IAuthorization
+  dbchat: 
 ) {
   await OAuthSubscribe(
     async (cid, chat_type, chat_title, onetimepass, code) => {
