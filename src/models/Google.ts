@@ -1,5 +1,6 @@
 import { prop, getModelForClass } from '@typegoose/typegoose'
 import { Auth } from 'googleapis'
+import { log } from '@/helpers/log'
 
 export class GoogleData implements Auth.Credentials {
   @prop()
@@ -21,9 +22,7 @@ export class GoogleData implements Auth.Credentials {
   public email: string
 
   @prop({ required: true, index: true, unique: true })
-  public userId: string
-}
-
+  public userId: string } 
 const GoogleCredentialsModel = getModelForClass(GoogleData, {
   schemaOptions: { timestamps: true },
 })
@@ -39,6 +38,7 @@ export async function findOrCreateGoogleData(
     try {
       found = new GoogleCredentialsModel({ userId })
     } catch (err) {
+      log.error(`[GoogleUserId=${userId}] Error on 'GoogleData' record creation: ${err}`)
       found = await GoogleCredentialsModel.findOne({ userId })
     }
   }

@@ -29,8 +29,8 @@ import { throttle } from '@/middlewares/throttle'
   await mongoConnect()
 
   // Middlewares
-  bot.use(ignoreOldMessageUpdates)
   bot.use(attachChat)
+  bot.use(ignoreOldMessageUpdates)
   bot.use(i18n.middleware(), attachI18N)
   bot.use(getMongoSession())
   bot.use(throttle())
@@ -43,9 +43,9 @@ import { throttle } from '@/middlewares/throttle'
   setupChatHandlers(bot, auth)
 
   // Errors
-  bot.catch((err, ctx) => {
-    log.error(`[c=${ctx.dbchat.cid}] ${err}`)
-  })
+//  bot.catch((err, ctx) => {
+//    log.error(`[c=${ctx.dbchat.cid}] ${err}`)
+//  })
 
   // Start
   await bot.launch()

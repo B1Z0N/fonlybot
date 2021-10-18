@@ -4,6 +4,8 @@ import { Telegraf, Telegram } from 'telegraf'
 import { MongoSessionContext } from '@/helpers/bot'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import { Document } from 'mongoose'
+import { Message } from 'typegram'
+
 
 export class Chat {
   @prop({ required: true, index: true, unique: true })
@@ -12,7 +14,7 @@ export class Chat {
   @prop({ required: true, default: 'en' })
   public language: string
 
-  @prop({ unique: true })
+  @prop()
   public userId?: string
 
   @prop()
@@ -51,6 +53,7 @@ export async function findOrCreateChat(id: number) {
     try {
       found = await new ChatModel({ cid: id }).save()
     } catch (err) {
+      log.error(`[c=${id}] Error on 'Chat' record creation: ${err}`)
       found = await ChatModel.findOne({ cid: id })
     }
   }
@@ -71,7 +74,7 @@ export class MessageDeleter {
     for (let todelid of dbchat.to_delete_ids) {
       towait.push(
         tg.deleteMessage(dbchat.cid, todelid).catch(e => {
-          log.info(`[${dbchat.cid}] The message was already deleted by someone.`)
+          log.info(`[c=${dbchat.cid}] The message was already deleted by someone.`)
         })
       )
     }
@@ -80,7 +83,8 @@ export class MessageDeleter {
     return Promise.all(towait)
   }
 
-  static push(dbchat: Chat & Document<any, BeAnObject, any>, id: number) {
-    return dbchat.updateOne({ to_delete_ids: [...dbchat.to_delete_ids, id] })
+  static push(dbchat: Chat & Document<any, BeAnObject, any>, msgs: [Message] | Message) {
+    let ids = Array.isArray(msgs) ? msgs.map(m => m.message_id) : [msgs.message_id]
+    return dbchat.updateOne({ to_delete_ids: [...dbchat.to_delete_ids, ...ids] })
   }
 }

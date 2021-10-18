@@ -77,7 +77,7 @@ export async function setupAuthHandlers(
 }
 
 export function googleHandler(auth: IAuthorization) {
-  return async function (ctx) {
+  return async function (ctx: MongoSessionContext) {
     await MessageDeleter.process(ctx.telegram, ctx.dbchat)
 
     const onetimepass = randomBytes(20).toString('hex')
@@ -89,18 +89,18 @@ export function googleHandler(auth: IAuthorization) {
       lang: ctx.dbchat.language,
     }
     ctx.dbchat.onetimepass = onetimepass
-    const msgText =
+
+    const signInMsg = await ctx.replyWithMarkdown(
       ctx
         .t('google_signin_md')
-        .replace('{0}', auth.getAuthUrl(JSON.stringify(state))) +
-      '\n' +
-      ctx.t('allow_drive')
-
-    const msg = await ctx.replyWithPhoto(
-      { source: allowDriveImg },
-      { caption: msgText, parse_mode: 'Markdown' }
+        .replace('{0}', auth.getAuthUrl(JSON.stringify(state)))
     )
-    await MessageDeleter.push(ctx.dbchat, msg.message_id)
+    const allowDriveMsg = await ctx.replyWithPhoto(
+      { source: allowDriveImg },
+      { caption: ctx.t('allow_drive') }
+    )
+
+    await MessageDeleter.push(ctx.dbchat, [signInMsg, allowDriveMsg])
     await ctx.dbchat.save()
   }
 }
