@@ -43,9 +43,9 @@ import { throttle } from '@/middlewares/throttle'
   setupChatHandlers(bot, auth)
 
   // Errors
-//  bot.catch((err, ctx) => {
-//    log.error(`[c=${ctx.dbchat.cid}] ${err}`)
-//  })
+  bot.catch((err, ctx) => {
+    log.error(`[c=${ctx.dbchat.cid}] ${err}`)
+  })
 
   // Start
   await bot.launch()
