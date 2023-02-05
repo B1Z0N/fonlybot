@@ -14,13 +14,15 @@ And you should be good to go! Feel free to fork and submit pull requests. Thanks
 -   `TOKEN` — Telegram bot token.
 -   `MONGO` — URL of the mongo database.
 -   `GOOGLE` — URL of your google app oauth.
+-   `CB_PORT` - port of the google api callback site.
+-   `HOOK_PORT` - telegram webhook port.
 
 Also, please, consider looking at `.env.sample`.
 
 # TODO
 
--   [Add](https://telegra.ph/So-your-bot-is-rate-limited-01-26) rate limits and queues to fix `429 Telegram error`
--   Switch to grammy-i18n
+-   Enable periodic bot db backup
+-   Switch to grammy-i18n and add lots of other languages
 -   Make code execute concurrently with `cluster`s
 -   Refactor all code
 
