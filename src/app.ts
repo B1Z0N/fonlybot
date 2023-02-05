@@ -48,6 +48,13 @@ import { throttle } from '@/middlewares/throttle'
   })
 
   // Start
-  await bot.launch()
+  await bot.launch({
+    webhook: {
+      domain: 'https://fonlybot.xyz',
+      hookPath: '/tghook',
+      host: 'localhost',
+      port: Number(process.env.HOOK_PORT),
+    }
+  });
   log.info(`Bot ${bot.botInfo.username} is up and running`)
 })()
