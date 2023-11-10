@@ -30,7 +30,7 @@
     },
     "dependencies": {
         "@typegoose/typegoose": "^8.3.0",
-        "axios": "^0.21.4",
+        "axios": "^1.6.0",
         "dotenv": "^10.0.0",
         "fastify": "^3.29.4",
         "googleapis": "^87.0.0",
